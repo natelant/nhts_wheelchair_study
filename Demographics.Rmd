@@ -1,0 +1,41 @@
+---
+title: "Demographics"
+author: "Nate Lant"
+date: "12/14/2019"
+output: 
+  html_document:
+    code_folding: hide
+
+editor_options: 
+  chunk_output_type: console
+  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(nhts2017)
+library(tidyverse)
+
+```
+
+# What percent of the population uses a wheelchair?
+
+In the 2017 National Household travel survey, the respondents are asked if they have a medical condition or handicap that makes it difficult to travel outside of the home. If they respond yes, they are asked if they have had this condition for less than six months, more than six months or their whole life. The next follow-up question asks them to select all that apply from a list of medical devices they use. This list includes a cane, walker, seeing eye-dog, crutches, motorized scooter, manual sheelchair, motorized wheelchair, or something else.
+
+This study compares the mobility of the abled population, the disabled population, and the population that uses wheelchairs (which is a subgroup of the disabled population). To make this comparison, I created a new variable called "Ability". Those that responded disabled for more than six months or their whole life were labelled "Disabled". Those that responded disabled (for more than six months or their whole life) and used a wheelchair (either manual or mechanical) were labelled "Wheelchair". The rest were labelled "Abled". The code is shown below
+
+```{r ability}
+# install.packages("devtools")
+# devtools::install_github("byu-transpolab/nhts2017")
+
+# library(nhts2017)
+# library(tidyverse)
+
+# Create the "Ability" variable in nhts_persons
+nhts_persons <- nhts_persons %>% 
+  mutate(Ability = case_when(w_chair == "07" | w_mtrchr == "08" ~ "Wheelchair",
+                             medcond6 == "02" | medcond6 == "03" ~ "Disabled",  
+                             medcond == "02" ~ "Abled")) 
+
+```
