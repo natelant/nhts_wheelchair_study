@@ -16,14 +16,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(nhts2017)
 library(tidyverse)
+library(plotly)
+library(pander)
+library(ggpubr)
+library(Hmisc)
 
+source("R/output_functions.R")
+
+nhts_persons <- nhts2017::nhts_persons
 ```
 
 # What percent of the population uses a wheelchair?
 
-In the 2017 National Household travel survey, the respondents are asked if they have a medical condition or handicap that makes it difficult to travel outside of the home. If they respond yes, they are asked if they have had this condition for less than six months, more than six months or their whole life. The next follow-up question asks them to select all that apply from a list of medical devices they use. This list includes a cane, walker, seeing eye-dog, crutches, motorized scooter, manual sheelchair, motorized wheelchair, or something else.
+In the 2017 National Household Travel Survey (NHTS), the respondents are asked if they have a medical condition or handicap that makes it difficult to travel outside of the home. If they respond yes, they are asked if they have had this condition for less than six months, more than six months or their whole life. The next follow-up question asks them to select all that apply from a list of medical devices they use. This list includes a cane, walker, seeing eye-dog, crutches, motorized scooter, manual sheelchair, motorized wheelchair, or something else.
 
-This study compares the mobility of the abled population, the disabled population, and the population that uses wheelchairs (which is a subgroup of the disabled population). To make this comparison, I created a new variable called "Ability". Those that responded disabled for more than six months or their whole life were labelled "Disabled". Those that responded disabled (for more than six months or their whole life) and used a wheelchair (either manual or mechanical) were labelled "Wheelchair". The rest were labelled "Abled". The code is shown below
+This study compares the mobility of the abled population, the disabled population, and the population that uses wheelchairs. To make this comparison, I created a new variable called "Ability". Those that responded disabled for more than six months or their whole life were labelled "Disabled". Those that responded disabled (for more than six months or their whole life) and used a wheelchair (either manual or mechanical) were labelled "Wheelchair" (note the "Disabled" population does not include wheelchair users). The rest were labelled "Abled".
 
 ```{r ability}
 # install.packages("devtools")
@@ -32,10 +39,142 @@ This study compares the mobility of the abled population, the disabled populatio
 # library(nhts2017)
 # library(tidyverse)
 
-# Create the "Ability" variable in nhts_persons
+# Create the "Ability" variable in nhts_persons.
 nhts_persons <- nhts_persons %>% 
+  left_join(nhts_households, by = "houseid") %>%
   mutate(Ability = case_when(w_chair == "07" | w_mtrchr == "08" ~ "Wheelchair",
                              medcond6 == "02" | medcond6 == "03" ~ "Disabled",  
                              medcond == "02" ~ "Abled")) 
 
+# I also want to group age into bin size of 10 years and income into three groups, "low", "med", and "high"
+
 ```
+
+The NHTS uses weights on each variable to estimate the total population. In my comparisons, I will show the number of respondents, the weighted population and the distribution of the population (I also filtered out NA responses, as they account for 0.6% of the population).
+
+```{r percent}
+nhts_persons %>% group_by(Ability) %>%
+  filter(Ability != "NA") %>%
+  summarise(Survey = n(),
+            population = sum(wtperfin)) %>%
+  mutate(Population = population,
+         `Distribution(%)` = round(population/sum(population)*100, 1)) %>%
+  select(-population) %>%
+  pander()
+```
+
+# Attributes of a Synthetic Population
+To model the behavior of wheelchair users, their attributes must match their travel patterns. These attributes include age and income.
+
+## Age
+
+From the distribution bar plot below, it is clear that the population of wheelchair users differs 
+
+```{r age.distribution plot}
+nhts_persons %>% left_join(nhts_households, by = "houseid") %>%
+  mutate(Age = case_when(r_age >= 00 & r_age < 10 ~ "0 - 10",
+                         r_age >= 10 & r_age < 20 ~ "10 - 20",
+                         r_age >= 20 & r_age < 30 ~ "20 - 30",
+                         r_age >= 30 & r_age < 40 ~ "30 - 40",
+                         r_age >= 40 & r_age < 50 ~ "40 - 50",
+                         r_age >= 50 & r_age < 60 ~ "50 - 60",
+                         r_age >= 60 & r_age < 70 ~ "60 - 70",
+                         r_age >= 70 & r_age < 80 ~ "70 - 80",
+                         r_age >= 80 & r_age < 90 ~ "80 - 90",
+                         r_age >= 90 & r_age < 100 ~ "90 - 100")) %>% 
+  group_by(Ability, Age) %>%
+  filter(Ability != "NA") %>%
+  summarise(population = sum(wtperfin)) %>%
+  mutate(Distribution = population/sum(population)) %>%
+  ggplot(aes(x = Age, y = Distribution)) + 
+    geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
+    ggtitle("Distribution of Age", "Comparison of Ability") +
+    labs(x = "Age", y = "Distribution") +
+    scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1))
+```
+
+**Summary Statistics of Age**
+```{r age.summary}
+# Summary of all ages
+nhts_persons %>% group_by(Ability) %>%
+  filter(Ability != "NA") %>%
+  summarise(Mean = mean(r_age),
+            Median = median(r_age)) %>%
+  pander()
+```
+
+**Summary Statistics of Ages 18-64**
+```{r age.summary.filtered}
+
+# Summary of ages 18-64
+nhts_persons %>% group_by(Ability) %>%
+  filter(Ability != "NA",
+         r_age >= 18 & r_age <= 64) %>%
+  summarise(Mean = mean(r_age),
+            Median = median(r_age)) %>%
+  pander()
+```
+
+
+## Income
+```{r income.distribution}
+nhts_persons %>% group_by(Ability, hhfaminc) %>%
+    filter(hhfaminc > 0,
+           Ability != "NA",
+           r_age >= 18 & r_age < 65) %>%
+    summarise(Population = sum(wtperfin)) %>%
+    as_factor() %>%
+    mutate(Distribution = Population/sum(Population)) %>%
+  ggplot(aes(x = hhfaminc, y = Distribution)) + 
+    geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
+    ggtitle("Distribution of Income Ages 18 - 64", "Comparison of Ability") +
+    labs(x = "Income", y = "Distribution") +
+    scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1))
+```
+
+Trends in mobility differ by income groups. For this study, I will divide income into four groups:
+```{r income.divide}
+# Create income group varaible "Income"
+nhts_persons <- nhts_persons %>%
+  mutate(Income = case_when(hhfaminc == "01" | hhfaminc == "02" | hhfaminc == "03" ~ "Low",
+                            hhfaminc == "04" | hhfaminc == "05" ~ "Mid-Low",
+                            hhfaminc == "06" | hhfaminc == "07" ~ "Mid-High",
+                            hhfaminc == "08" | hhfaminc == "09" | hhfaminc == "10" | hhfaminc == "11" ~ "High"))
+```
+
+ + *Low* = Less than $25,000
+ + *Mid-Low* = `$25,000 - $50,000`
+ + *Mid-High* = `$50,000 - $100,000`
+ + *High* = More than $100,000
+ 
+```{r income.group.distribution}
+# Distribution plot
+nhts_persons %>% group_by(Ability, Income) %>%
+  filter(Ability != "NA",
+         r_age >= 18 & r_age < 65,
+         Income != "NA") %>%
+    summarise(Population = sum(wtperfin)) %>% 
+    mutate(Distribution = Population/sum(Population),
+           Income = fct_relevel(Income, "Low", "Mid-Low", "Mid-High", "High")) %>%
+  ggplot(aes(x = Income, y = Distribution)) + 
+    geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
+    ggtitle("Distribution of Income by Groups Ages 18 - 64", "Comparison of Ability") +
+    labs(x = "Income", y = "Distribution") +
+    scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1))
+```
+ 
+ 
+ 
+ 
