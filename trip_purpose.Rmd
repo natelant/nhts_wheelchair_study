@@ -10,12 +10,22 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-library(scales)
+library(scales) # need for the axis as percent
+
+library(nhts2017)
+library(tidyverse)
+library(plotly)
+library(pander)
+library(ggpubr)
+library(Hmisc)
+
+## An important note when labeling variables. I joined persons with household twice (hhfaminc.x) from the first page to the second page...
+## so maybe this creating and filtering data chunck on each page is unecessary.
 ```
 
 ```{r persons.data}
 # Creating variables and filtering the persons population
-nhts_persons <- nhts_persons %>% 
+nhts_persons <- nhts_persons %>%
   mutate(hhpersonid = paste(houseid, personid, sep = "-"), # Joins household ID with person ID so that each person has a unique ID
          Ability = case_when(w_chair == "07" | w_mtrchr == "08" ~ "Wheelchair",
                              medcond6 == "02" | medcond6 == "03" ~ "Disabled",  
@@ -65,7 +75,11 @@ joined_grid_trips <- new_trips %>% right_join(new_grid) %>%
     scale_x_continuous(breaks = c(0:10)) +
     scale_y_continuous(labels = percent_format()) +
     facet_grid(Income ~ trippurp, scales = "free_x")
-  
-  #plot %>% ggplotly(tooltip = c("x", "y", "fill")) %>% layout(boxmode = "group")
+```
 
+## Poisson Regression
+It looks like "Ability" has no effect on trip purpose, instead, income may be what affects the number of trips by purpose the most.
+
+```{r purpose.poisson}
+hbw <- glm(trippurp$hbw ~ Ability, Income, worker, family = "poisson", data = joined_grid_trips)
 ```
