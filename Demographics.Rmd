@@ -5,10 +5,6 @@ date: "12/14/2019"
 output: 
   html_document:
     code_folding: hide
-
-editor_options: 
-  chunk_output_type: console
-  
 ---
 
 ```{r setup, include=FALSE}

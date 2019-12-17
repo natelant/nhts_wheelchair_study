@@ -26,24 +26,16 @@ library(Hmisc)
 ```{r persons.data}
 # Creating variables and filtering the persons population
 nhts_persons <- nhts_persons %>%
-  mutate(hhpersonid = paste(houseid, personid, sep = "-"), # Joins household ID with person ID so that each person has a unique ID
-         Ability = case_when(w_chair == "07" | w_mtrchr == "08" ~ "Wheelchair",
-                             medcond6 == "02" | medcond6 == "03" ~ "Disabled",  
-                             medcond == "02" ~ "Abled"),
-         Income = case_when(hhfaminc == "01" | hhfaminc == "02" | hhfaminc == "03" ~ "Low",
-                            hhfaminc == "04" | hhfaminc == "05" ~ "Mid-Low",
-                            hhfaminc == "06" | hhfaminc == "07" ~ "Mid-High",
-                            hhfaminc == "08" | hhfaminc == "09" | hhfaminc == "10" | hhfaminc == "11" ~ "High"),
-         Income = fct_relevel(Income, "Low", "Mid-Low", "Mid-High", "High")) %>% 
-    filter(r_age >= 18 & r_age < 65,
-           Ability != "NA",
-           Income != "NA")
+  mutate(hhpersonid = paste(houseid, personid, sep = "-")) %>%
+  filter(Ability != "NA",
+         r_age >= 18 & r_age < 65,
+         Income != "NA")
 ```
 
 # How does travel differ between wheelchair users and the abled population considering trip purpose?
 
 ```{r trip.purpose, message=F, warning=F}
-# This attempt contains all trips (all households, persons, etc.)
+# This data will contain all trips (all households, persons, etc.)
 new_trips <- nhts_trips %>% mutate(hhpersonid = paste(houseid, personid, sep = "-")) %>%
   filter(hhpersonid %in% nhts_persons$hhpersonid) %>%
   group_by(hhpersonid, trippurp) %>%
@@ -56,11 +48,10 @@ new_grid <- expand_grid(hhpersonid = unique(new_trips$hhpersonid), trippurp = un
   filter(trippurp != "-9")
 
 
-# combine the grid and the trips then pipe into a histogram
+# combine the grid and the trips
 joined_grid_trips <- new_trips %>% right_join(new_grid) %>%
   mutate(n = ifelse(is.na(n), 0, n)) %>%
-  left_join(nhts_persons, "hhpersonid") %>% 
-  group_by(Ability)
+  left_join(nhts_persons, "hhpersonid") 
 
   # pipe into the histogram
   ggplot(joined_grid_trips, aes(x = n)) + 
@@ -81,5 +72,17 @@ joined_grid_trips <- new_trips %>% right_join(new_grid) %>%
 It looks like "Ability" has no effect on trip purpose, instead, income may be what affects the number of trips by purpose the most.
 
 ```{r purpose.poisson}
-hbw <- glm(trippurp$hbw ~ Ability, Income, worker, family = "poisson", data = joined_grid_trips)
+joined_grid_trips$HBW <- ifelse(joined_grid_trips$trippurp == "HBW", TRUE, FALSE)
+fit.hbw <- glm(HBW ~ Ability, Income, worker, family = "poisson", data = joined_grid_trips)
 ```
+
+
+
+
+
+
+
+
+
+
+
