@@ -19,18 +19,29 @@ library(Hmisc)
 ```
 
 ```{r data.refresh}
-persons_edited <- read_rds("R/edited_persons.rds") %>%
-  mutate(hhpersonid = paste(houseid, personid, sep = "-"))
-```
-
-*Summary of Trip Length in Miles By Ability Ages 18-64*
-```{r summary.length}
 # Add hhpersonid to nhts_trips
 nhts_trips <- nhts_trips %>% mutate(hhpersonid = paste(houseid, personid, sep = "-"),
                                     trpmiles = as.double(trpmiles))
 
+# Join persons_edited file from Demographics.Rmd with trips
+read_rds("R/edited_persons.rds") %>% 
+  left_join(nhts_trips %>% select(hhpersonid, trpmiles, trippurp, trptrans, trvlcmin, psgr_flg), 
+            by = "hhpersonid") %>%
+  filter(trptrans > 0) %>%
+  write_rds("R/persons_trips.rds")
+
+# Store persons_trips as .rds
+persons_trips <- read_rds("R/persons_trips.rds")
+
+
+
+ 
+```
+
+*Summary of Trip Length in Miles By Ability Ages 18-64*
+```{r summary.length}
 # Summary
-persons_edited %>% left_join(nhts_trips, by = "hhpersonid") %>%
+persons_trips  %>%
   filter(trpmiles > 0) %>%
   group_by(Ability) %>%
   summarise(Mean = mean(trpmiles),
@@ -40,10 +51,8 @@ persons_edited %>% left_join(nhts_trips, by = "hhpersonid") %>%
 ```
 
 ```{r plot.length.purpose.income}
-
-# Join nhts_persons and nhts_trips to build violin grid
 # nhts_persons is still filtered by Age
-persons_edited %>% left_join(nhts_trips, by = "hhpersonid") %>%
+persons_trips %>%
   filter(trpmiles < 50,
          trpmiles > 0,
          trippurp != -9) %>%
@@ -64,7 +73,7 @@ ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) + geom_violin() +
 ## Trip Length Frequency Distribution
 
 ```{r length.frequency}
-persons_edited %>% left_join(nhts_trips, by = "hhpersonid") %>%
+persons_trips %>%
   filter(trpmiles < 50,
          trpmiles > 0,
          trippurp != -9) %>%

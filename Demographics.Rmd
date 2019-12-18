@@ -169,8 +169,16 @@ nhts_persons %>% group_by(Ability, Income) %>%
 ```
  
 ```{r store.data}
-nhts_persons %>% write_rds("R/edited_persons.rds")
-
+## Storing the persons file to use in other .Rmd
+# 1. Joins households with houseid and hhfaminc
+# 2. Creates Ability variable (and filters "NA")
+# 3. Creates age groups
+# 4. Filters age to 18-64
+# 5. Creates Income variable, reorders the levels and filters "NA"
+nhts_persons %>%
+  mutate(hhpersonid = paste(houseid, personid, sep = "-")) %>% 
+  write_rds("R/edited_persons.rds") 
+# 6. Creates the "houseid-personid" unique id for each person
 ```
  
  

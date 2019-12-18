@@ -3,16 +3,61 @@ title: "Mode Choice"
 author: "Nate Lant"
 date: "12/17/2019"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(nhts2017)
+library(tidyverse)
+library(plotly)
+library(pander)
+library(ggpubr)
+library(Hmisc)
+
+# .rds is stored from trip_length.Rmd (selected only some variables from nhts_trips)
+persons_trips <- read_rds("R/persons_trips.rds")
 ```
 
 # Mode Choice
 
+```{r mode.table}
+# This table includes all mode. Distribution is of weighted population.
+persons_trips %>% group_by(Ability, trptrans) %>%
+  summarise(Survey = n(),
+            population = sum(wtperfin)) %>%
+  mutate(Population = population,
+         `Distribution(%)` = round(population/sum(population)*100, 1)) %>%
+  select(Ability, trptrans, `Distribution(%)`) %>%
+  spread(Ability, `Distribution(%)`) %>% print(n=25)
+```
+
 ```{r aggregate.mode}
-nhts_persons
+persons_trips %>% mutate(Mode = case_when(psgr_flg == "02" & trptrans == "03" | trptrans == "04" | trptrans == "06"  ~ "Car (Driver)",
+                                          psgr_flg == "01" & trptrans == "03" | trptrans == "04" | trptrans == "06"  ~ "Car (Passenger)",
+                                          psgr_flg == "02" & trptrans == "05" ~ "Van (Driver)",
+                                          psgr_flg == "01" & trptrans == "05" ~ "Van (Passenger)",
+                                          trptrans == "01" ~ "Walk",
+                                          trptrans == "12" ~ "Paratransit",
+                                          trptrans == "17" ~ "Taxi (Including Uber/Lyft)",
+                                          trptrans == "11" | trptrans == "16"  ~ "Local Transit",
+                                          trptrans == "07" | trptrans == "08" | trptrans == "09" | trptrans == "10" | trptrans == "14" | trptrans == "15" | trptrans == "18" | trptrans == "19" | trptrans == "20" | trptrans == "97" | trptrans == "02" | trptrans == "13"  ~ "Other")) %>%
+  group_by(Ability, Mode) %>%
+  summarise(Population = sum(wtperfin)) %>%
+    as_factor() %>%
+    mutate(Distribution = Population/sum(Population)) %>%
+  ggplot(aes(x = Mode, y = Distribution)) + 
+    geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
+    ggtitle("Distribution of Mode Ages 18-64", "Comparison of Ability") +
+    labs(x = "Mode", y = "Distribution") +
+    scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1))
 
 # i need to do a case_when for all the modes and just have a few modes
 ```
+

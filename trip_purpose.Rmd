@@ -23,8 +23,7 @@ library(Hmisc)
 
 ```{r persons.data}
 # Creating variables and filtering the persons population
-persons_edited <- read_rds("R/edited_persons.rds") %>%
-  mutate(hhpersonid = paste(houseid, personid, sep = "-"))
+persons_edited <- read_rds("R/edited_persons.rds") 
 ```
 
 # How does travel differ between wheelchair users and the abled population considering trip purpose?
