@@ -43,7 +43,8 @@ persons_trips %>% mutate(Mode = case_when(psgr_flg == "02" & trptrans == "03" | 
                                           trptrans == "12" ~ "Paratransit",
                                           trptrans == "17" ~ "Taxi (Including Uber/Lyft)",
                                           trptrans == "11" | trptrans == "16"  ~ "Local Transit",
-                                          trptrans == "07" | trptrans == "08" | trptrans == "09" | trptrans == "10" | trptrans == "14" | trptrans == "15" | trptrans == "18" | trptrans == "19" | trptrans == "20" | trptrans == "97" | trptrans == "02" | trptrans == "13"  ~ "Other")) %>%
+                                          trptrans == "07" | trptrans == "08" | trptrans == "09" | trptrans == "10" | trptrans == "14" | trptrans == "15" | trptrans == "18" | trptrans == "19" | trptrans == "20" | trptrans == "97" | trptrans == "02" | trptrans == "13"  ~ "Other"),
+                         Mode = fct_relevel(Mode, "Car (Driver)", "Car (Passenger)", "Van (Driver)", "Van (Passenger)", "Local Transit", "Paratransit", "Taxi (Including Uber/Lyft)", "Walk", "Other"))  %>%
   group_by(Ability, Mode) %>%
   summarise(Population = sum(wtperfin)) %>%
     as_factor() %>%
@@ -57,7 +58,5 @@ persons_trips %>% mutate(Mode = case_when(psgr_flg == "02" & trptrans == "03" | 
                                      angle = 45,
                                      hjust = 1,
                                      vjust = 1))
-
-# i need to do a case_when for all the modes and just have a few modes
 ```
 
