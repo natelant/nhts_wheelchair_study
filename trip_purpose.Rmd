@@ -19,17 +19,12 @@ library(pander)
 library(ggpubr)
 library(Hmisc)
 
-## An important note when labeling variables. I joined persons with household twice (hhfaminc.x) from the first page to the second page...
-## so maybe this creating and filtering data chunck on each page is unecessary.
 ```
 
 ```{r persons.data}
 # Creating variables and filtering the persons population
-nhts_persons <- nhts_persons %>%
-  mutate(hhpersonid = paste(houseid, personid, sep = "-")) %>%
-  filter(Ability != "NA",
-         r_age >= 18 & r_age < 65,
-         Income != "NA")
+persons_edited <- read_rds("R/edited_persons.rds") %>%
+  mutate(hhpersonid = paste(houseid, personid, sep = "-"))
 ```
 
 # How does travel differ between wheelchair users and the abled population considering trip purpose?
@@ -37,7 +32,7 @@ nhts_persons <- nhts_persons %>%
 ```{r trip.purpose, message=F, warning=F}
 # This data will contain all trips (all households, persons, etc.)
 new_trips <- nhts_trips %>% mutate(hhpersonid = paste(houseid, personid, sep = "-")) %>%
-  filter(hhpersonid %in% nhts_persons$hhpersonid) %>%
+  filter(hhpersonid %in% persons_edited$hhpersonid) %>%
   group_by(hhpersonid, trippurp) %>%
   tally() %>%
   mutate(n = ifelse(n > 10, 10, n))
@@ -51,7 +46,7 @@ new_grid <- expand_grid(hhpersonid = unique(new_trips$hhpersonid), trippurp = un
 # combine the grid and the trips
 joined_grid_trips <- new_trips %>% right_join(new_grid) %>%
   mutate(n = ifelse(is.na(n), 0, n)) %>%
-  left_join(nhts_persons, "hhpersonid") 
+  left_join(persons_edited, "hhpersonid") 
 
   # pipe into the histogram
   ggplot(joined_grid_trips, aes(x = n)) + 

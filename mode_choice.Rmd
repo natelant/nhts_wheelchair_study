@@ -1,0 +1,18 @@
+---
+title: "Mode Choice"
+author: "Nate Lant"
+date: "12/17/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Mode Choice
+
+```{r aggregate.mode}
+nhts_persons
+
+# i need to do a case_when for all the modes and just have a few modes
+```

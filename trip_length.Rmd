@@ -1,0 +1,80 @@
+---
+title: "Trip Length"
+author: "Nate Lant"
+date: "12/17/2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(nhts2017)
+library(tidyverse)
+library(plotly)
+library(pander)
+library(ggpubr)
+library(Hmisc)
+```
+
+```{r data.refresh}
+persons_edited <- read_rds("R/edited_persons.rds") %>%
+  mutate(hhpersonid = paste(houseid, personid, sep = "-"))
+```
+
+*Summary of Trip Length in Miles By Ability Ages 18-64*
+```{r summary.length}
+# Add hhpersonid to nhts_trips
+nhts_trips <- nhts_trips %>% mutate(hhpersonid = paste(houseid, personid, sep = "-"),
+                                    trpmiles = as.double(trpmiles))
+
+# Summary
+persons_edited %>% left_join(nhts_trips, by = "hhpersonid") %>%
+  filter(trpmiles > 0) %>%
+  group_by(Ability) %>%
+  summarise(Mean = mean(trpmiles),
+            Median = median(trpmiles),
+            Max = max(trpmiles)) %>%
+  pander()
+```
+
+```{r plot.length.purpose.income}
+
+# Join nhts_persons and nhts_trips to build violin grid
+# nhts_persons is still filtered by Age
+persons_edited %>% left_join(nhts_trips, by = "hhpersonid") %>%
+  filter(trpmiles < 50,
+         trpmiles > 0,
+         trippurp != -9) %>%
+# Grid violin plot
+ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) + geom_violin() +
+  geom_boxplot(width=0.1, fill = "white") +
+  facet_grid(Income ~ trippurp, scales = "free_x") +
+    ggtitle("Comparing the Trip Length under 50 Miles by Trip Purpose and Income group Ages 18-24", subtitle = "Comparison of Ability") +
+    labs( y = "Lenth of Trip in Miles") +
+    scale_fill_brewer(palette = "PuBuGn", direction = 1) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1))
+
+```
+
+## Trip Length Frequency Distribution
+
+```{r length.frequency}
+persons_edited %>% left_join(nhts_trips, by = "hhpersonid") %>%
+  filter(trpmiles < 50,
+         trpmiles > 0,
+         trippurp != -9) %>%
+  ggplot(aes(x = trpmiles, fill = Ability)) + geom_histogram(aes(y = stat(width*density)), alpha = 0.4, position = "identity") +
+  facet_grid(Income ~ trippurp) +
+    ggtitle("Comparing the Trip Length Frequency Distribution under 50 Miles by Trip Purpose and Income group Ages 18-24", subtitle = "Comparison of Ability") +
+    labs( y = "Distribution of Frequency") +
+    scale_fill_brewer(palette = "PuBuGn", direction = 1) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1))
+```
