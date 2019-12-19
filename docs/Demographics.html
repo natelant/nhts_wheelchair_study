@@ -549,6 +549,7 @@ nhts_persons %&gt;% group_by(Ability, Income) %&gt;%
                                      hjust = 1,
                                      vjust = 1))</code></pre>
 <p><img src="Demographics_files/figure-html/income.group.distribution-1.png" width="672" /></p>
+<p>The interactive table below shows the number of individuals that responded to the survey, their income group, and their ability. The NHTS uses weights to calculate the total population based on the number of respondents, then the table shows the distribution of that weighted population for each subgroup.</p>
 <pre class="r"><code>nhts_persons %&gt;% group_by(Ability, Income) %&gt;%
   summarise(Survey = n(),
             population = round(sum(wtperfin), 0)) %&gt;%
@@ -556,8 +557,8 @@ nhts_persons %&gt;% group_by(Ability, Income) %&gt;%
          `Distribution(%)` = round(population/sum(population)*100, 1)) %&gt;%
   select(-population) %&gt;%
   datatable()</code></pre>
-<div id="htmlwidget-a3139d24abdd73304c7b" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-a3139d24abdd73304c7b">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12"],["Abled","Abled","Abled","Abled","Disabled","Disabled","Disabled","Disabled","Wheelchair","Wheelchair","Wheelchair","Wheelchair"],["Low","Mid-Low","Mid-High","High","Low","Mid-Low","Mid-High","High","Low","Mid-Low","Mid-High","High"],[16614,24454,47601,54682,3907,2004,1725,930,504,251,222,134],[28675108,34996137,57126663,61716362,5718396,2566623,1765458,916471,778314,298839,188363,133754],[15.7,19.2,31.3,33.8,52.1,23.4,16.1,8.4,55.6,21.4,13.5,9.6]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Ability<\/th>\n      <th>Income<\/th>\n      <th>Survey<\/th>\n      <th>Population<\/th>\n      <th>Distribution(%)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[3,4,5]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-60dbd744cb137a1a7ee8" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-60dbd744cb137a1a7ee8">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12"],["Abled","Abled","Abled","Abled","Disabled","Disabled","Disabled","Disabled","Wheelchair","Wheelchair","Wheelchair","Wheelchair"],["Low","Mid-Low","Mid-High","High","Low","Mid-Low","Mid-High","High","Low","Mid-Low","Mid-High","High"],[16614,24454,47601,54682,3907,2004,1725,930,504,251,222,134],[28675108,34996137,57126663,61716362,5718396,2566623,1765458,916471,778314,298839,188363,133754],[15.7,19.2,31.3,33.8,52.1,23.4,16.1,8.4,55.6,21.4,13.5,9.6]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Ability<\/th>\n      <th>Income<\/th>\n      <th>Survey<\/th>\n      <th>Population<\/th>\n      <th>Distribution(%)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[3,4,5]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="employment-status" class="section level3">
 <h3>Employment Status</h3>
@@ -589,7 +590,7 @@ nhts_persons %&gt;% group_by(Ability, Worker) %&gt;%
 # 5. Creates Income variable, reorders the levels and filters &quot;NA&quot;
 nhts_persons %&gt;%
   mutate(hhpersonid = paste(houseid, personid, sep = &quot;-&quot;)) %&gt;% 
-  write_rds(&quot;R/edited_persons.rds&quot;) 
+  write_rds(&quot;data/edited_persons.rds&quot;) 
 # 6. Creates the &quot;houseid-personid&quot; unique id for each person</code></pre>
 </div>
 </div>

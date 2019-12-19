@@ -321,7 +321,7 @@ $(document).ready(function () {
 
 
 <pre class="r"><code># Creating variables and filtering the persons population
-persons_edited &lt;- read_rds(&quot;R/edited_persons.rds&quot;) 
+persons_edited &lt;- read_rds(&quot;data/edited_persons.rds&quot;) 
 
 # This data will contain all trips (all households, persons, etc.)
 # find all trips that belong to an hhpersonid groups them by purpose and counts them
@@ -355,7 +355,7 @@ joined_grid_trips &lt;- new_trips %&gt;% right_join(new_grid) %&gt;%
     scale_x_continuous(breaks = c(0:10)) +
     scale_y_continuous(labels = percent_format()) +
     facet_wrap(~trippurp)</code></pre>
-<p><img src="trip_purpose_files/figure-html/trip.purpose-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="trip_purpose_files/figure-html/trip.purpose-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>As the plot above only shows the Ability variable and trip purpose, it is likely that other variables have an influence on the difference in number of trips taken. Income, for example, may explain why wheelchair users travel differently than the abled population. This plot shows the same distribution of number of trips by purpose, but includes and compares the income groups. (Zoom in if necessary)</p>
 <pre class="r"><code>ggplot(joined_grid_trips, aes(x = n)) + 
   geom_histogram(aes(y = stat(width*density), fill = Ability), binwidth = 0.8, colour = &quot;black&quot;, size = .1, position = &quot;dodge&quot;) +
