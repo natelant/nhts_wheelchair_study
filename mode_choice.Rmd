@@ -120,7 +120,7 @@ persons_trips %>%
   # make a plot of the distributions
   ggplot(aes(x = Mode, y = Distribution)) +
     geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
-    ggtitle("Distribution of Mode Ages 18-64", "Comparison of Ability") +
+    ggtitle("Distribution of Mode, Ages 18-64", "Comparison of Ability") +
     labs(x = "Mode", y = "Distribution") +
     scale_fill_brewer(palette = "PuBuGn", direction = 2) +
     theme(axis.text.x =
