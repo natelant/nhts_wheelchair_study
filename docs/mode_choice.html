@@ -328,8 +328,6 @@ $(document).ready(function () {
 </div>
 
 
-<div id="mode-choice" class="section level1">
-<h1>Mode Choice</h1>
 <p>The NHTS reports mode chosen per trip reported. Below is a table that shows the percent distribution of the mode choice for each population of ability. The interactive table allows the user to sort the table by variable to find the most frequent mode chosen by each ability group. As many of the modes are infrequent, many of the modes can be considered “other”.</p>
 <p><strong>Distribution of Mode Choice</strong></p>
 <pre class="r"><code># This table includes all modes. Distribution is of weighted population.
@@ -341,8 +339,8 @@ persons_trips %&gt;% group_by(Ability, trptrans) %&gt;%
          Mode = as_factor(trptrans)) %&gt;%
   select(Ability, Mode, `Distribution(%)`) %&gt;%
   spread(Ability, `Distribution(%)`) %&gt;% datatable()</code></pre>
-<div id="htmlwidget-4718b0af22023509816b" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-4718b0af22023509816b">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21"],["Walk","Bicycle","Car","SUV","Van","Pickup truck","Golf cart / Segway","Motorcycle / Moped","RV (motor home, ATV, snowmobile)","School bus","Public or commuter bus","Paratransit / Dial-a-ride","Private / Charter / Tour / Shuttle bus","City-to-city bus (Greyhound, Megabus)","Amtrak / Commuter rail","Subway / elevated / light rail / street car","Taxi / limo (including Uber / Lyft)","Rental car (Including Zipcar / Car2Go)","Airplane","Boat / ferry / water taxi","Something Else"],[10.3,1,43.9,22.9,6.4,10.4,0,0.3,0.1,0.1,1.4,0,0.2,0,0.3,1.1,0.6,0.3,0.2,0.1,0.4],[15,1.2,44.2,15.4,7.3,7.7,0,0.2,0.1,0.3,4.6,1.3,0.5,0.2,0.2,0.4,0.9,0.1,0,0,0.3],[6.6,0.1,38.2,14.8,10.3,8.5,null,0.4,0,0.1,5.7,4.3,0.5,0,null,0.7,2.6,0,0.3,0,6.8]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Mode<\/th>\n      <th>Abled<\/th>\n      <th>Disabled<\/th>\n      <th>Wheelchair<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-9745e8e3c45a9dd78bbb" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9745e8e3c45a9dd78bbb">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21"],["Walk","Bicycle","Car","SUV","Van","Pickup truck","Golf cart / Segway","Motorcycle / Moped","RV (motor home, ATV, snowmobile)","School bus","Public or commuter bus","Paratransit / Dial-a-ride","Private / Charter / Tour / Shuttle bus","City-to-city bus (Greyhound, Megabus)","Amtrak / Commuter rail","Subway / elevated / light rail / street car","Taxi / limo (including Uber / Lyft)","Rental car (Including Zipcar / Car2Go)","Airplane","Boat / ferry / water taxi","Something Else"],[10.3,1,43.9,22.9,6.4,10.4,0,0.3,0.1,0.1,1.4,0,0.2,0,0.3,1.1,0.6,0.3,0.2,0.1,0.4],[15,1.2,44.2,15.4,7.3,7.7,0,0.2,0.1,0.3,4.6,1.3,0.5,0.2,0.2,0.4,0.9,0.1,0,0,0.3],[6.6,0.1,38.2,14.8,10.3,8.5,null,0.4,0,0.1,5.7,4.3,0.5,0,null,0.7,2.6,0,0.3,0,6.8]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Mode<\/th>\n      <th>Abled<\/th>\n      <th>Disabled<\/th>\n      <th>Wheelchair<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 <p>As some of the modes are irrelevant to the study, the mode choices will be aggregated into categories. The NHTS asks respondents if they were drivers or passengers on their trip, and this information is important as many wheelchair-dependent individuals may rely on others for private transportation. The following modes were highlighted as most relevant.</p>
 <pre class="r"><code>persons_trips %&gt;% mutate(Mode = case_when(psgr_flg == &quot;02&quot; &amp; trptrans == &quot;03&quot; | trptrans == &quot;04&quot; | trptrans == &quot;06&quot;  ~ &quot;Car (Driver)&quot;,
                                           psgr_flg == &quot;01&quot; &amp; trptrans == &quot;03&quot; | trptrans == &quot;04&quot; | trptrans == &quot;06&quot;  ~ &quot;Car (Passenger)&quot;,
@@ -367,8 +365,7 @@ persons_trips %&gt;% group_by(Ability, trptrans) %&gt;%
                                      angle = 45,
                                      hjust = 1,
                                      vjust = 1))</code></pre>
-<p><img src="mode_choice_files/figure-html/aggregate.mode-1.png" width="120%" style="display: block; margin: auto;" /></p>
-</div>
+<p><img src="mode_choice_files/figure-html/aggregate.mode-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 
 

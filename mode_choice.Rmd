@@ -20,10 +20,8 @@ library(DT)
 
 
 # .rds is stored from trip_length.Rmd (selected only some variables from nhts_trips)
-persons_trips <- read_rds("R/persons_trips.rds")
+persons_trips <- read_rds("data/persons_trips.rds")
 ```
-
-# Mode Choice
 
 The NHTS reports mode chosen per trip reported. Below is a table that shows the percent distribution of the mode choice for each population of ability. The interactive table allows the user to sort the table by variable to find the most frequent mode chosen by each ability group. As many of the modes are infrequent, many of the modes can be considered "other".
 
@@ -41,7 +39,7 @@ persons_trips %>% group_by(Ability, trptrans) %>%
 ```
 
 As some of the modes are irrelevant to the study, the mode choices will be aggregated into categories. The NHTS asks respondents if they were drivers or passengers on their trip, and this information is important as many wheelchair-dependent individuals may rely on others for private transportation. The following modes were highlighted as most relevant.
-```{r aggregate.mode, out.width = "120%", fig.align = "center"}
+```{r aggregate.mode, fig.align = "center"}
 persons_trips %>% mutate(Mode = case_when(psgr_flg == "02" & trptrans == "03" | trptrans == "04" | trptrans == "06"  ~ "Car (Driver)",
                                           psgr_flg == "01" & trptrans == "03" | trptrans == "04" | trptrans == "06"  ~ "Car (Passenger)",
                                           psgr_flg == "02" & trptrans == "05" ~ "Van (Driver)",
@@ -67,3 +65,4 @@ persons_trips %>% mutate(Mode = case_when(psgr_flg == "02" & trptrans == "03" | 
                                      vjust = 1))
 ```
 
+There is a significant decrease in the distribution of abled individuals from driver to passenger in both the car and the van. However, this difference is not as critical for wheelchair users (especially for the van).

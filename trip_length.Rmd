@@ -23,19 +23,21 @@ nhts_trips <- nhts_trips %>% mutate(hhpersonid = paste(houseid, personid, sep = 
                                     trpmiles = as.double(trpmiles))
 
 # Join persons_edited file from Demographics.Rmd with trips
-read_rds("R/edited_persons.rds") %>% 
+read_rds("data/edited_persons.rds") %>% 
   left_join(nhts_trips %>% select(hhpersonid, trpmiles, trippurp, trptrans, trvlcmin, psgr_flg), 
             by = "hhpersonid") %>%
   filter(trptrans > 0) %>%
-  write_rds("R/persons_trips.rds")
+  write_rds("data/persons_trips.rds")
 
 # Store persons_trips as .rds
-persons_trips <- read_rds("R/persons_trips.rds")
+persons_trips <- read_rds("data/persons_trips.rds")
 
 
 
  
 ```
+
+Is there evidence that wheelchair users are restricted to shorter trips? According to the 2017 NHTS, the median trip length for wheelchair users of 3.2 is only slightly less than the 3.8 miles median for the abled population.
 
 **Summary of Trip Length in Miles By Ability Ages 18-64**
 ```{r summary.length}
@@ -43,13 +45,14 @@ persons_trips <- read_rds("R/persons_trips.rds")
 persons_trips  %>%
   filter(trpmiles > 0) %>%
   group_by(Ability) %>%
-  summarise(Mean = mean(trpmiles),
-            Median = median(trpmiles),
+  summarise(Mean = mean(trpmiles) %>% round(1),
+            SD = sd(trpmiles) %>% round(1),
+            Median = median(trpmiles) %>% round(1),
             Max = max(trpmiles)) %>%
-  pander()
+   pander()
 ```
 
-```{r plot.length.purpose.income, fig.align = "center"}
+```{r plot.length.purpose.income, fig.width=12, fig.height=12}
 # nhts_persons is still filtered by Age
 persons_trips %>%
   filter(trpmiles < 50,
@@ -71,7 +74,7 @@ ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) + geom_violin() +
 
 ## Trip Length Frequency Distribution
 
-```{r length.frequency, message=F, fig.align = "center"}
+```{r length.frequency, message=F}
 plot <- persons_trips %>%
   filter(trpmiles < 50,
          trpmiles > 0,
@@ -79,12 +82,12 @@ plot <- persons_trips %>%
   ggplot(aes(x = trpmiles, fill = trippurp)) + geom_histogram(aes(y = stat(width*density)), alpha = 0.7, position = "identity") +
   facet_grid(Ability ~ Income) +
     ggtitle("Comparing the Trip Length Frequency Distribution under 50 Miles by Trip Purpose and Income group Ages 18-24", subtitle = "Comparison of Ability") +
-    labs( y = "Distribution of Frequency") +
+    labs(x = "Trip Distance (miles)", y = "Distribution of Frequency") +
     scale_fill_brewer(palette = "Set3", direction = 1) + 
     theme(axis.text.x = element_text(size  = 10, 
                                      angle = 45,
                                      hjust = 1,
                                      vjust = 1))
 
-plot %>% ggplotly(tooltip = c("x", "y", "fill"))
+plot %>% ggplotly(tooltip = c("x", "y", "fill"), width = 1000, height = 1000)
 ```

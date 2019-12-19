@@ -20,9 +20,9 @@ library(Hmisc)
 
 ```
 
-```{r persons.data}
+```{r persons.data, message=F, warning=F}
 # Creating variables and filtering the persons population
-persons_edited <- read_rds("R/edited_persons.rds") 
+persons_edited <- read_rds("data/edited_persons.rds") 
 
 # This data will contain all trips (all households, persons, etc.)
 # find all trips that belong to an hhpersonid groups them by purpose and counts them
@@ -47,12 +47,12 @@ joined_grid_trips <- new_trips %>% right_join(new_grid) %>%
 One major indication of mobility behavior is trip purpose. In the plot below, I show the counts (as a distribution) for number of trips in a day by trip purpose. The results show that travel behavior is different between the able bodied population and the wheelchair-dependent population. The major outlier is the home-based work trips, and that can be attributed to the major difference in employment among the ability groups.
 
 
-```{r trip.purpose, message=F, warning=F, out.width = "120%", fig.align = "center"}
+```{r trip.purpose, message=F, warning=F, fig.width=8, fig.height=6, fig.align = "center"}
   # build distribution histogram from the built out grid of trips counted
   ggplot(joined_grid_trips, aes(x = n)) + 
   geom_histogram(aes(y = stat(width*density), fill = Ability), binwidth = 0.8, colour = "black", size = .1, position = "dodge") +
-    ggtitle("Comparing the number of trips by trip purpose and Income group", subtitle = "Comparison of Ability") +
-    labs(x = "Number of Trips", y = "Percent of subgroup population") +
+    ggtitle("Comparing the Number of Trips in a Single Day", subtitle = "Comparison of Ability") +
+    labs(x = "Number of Trips", y = "Percent of Subgroup Population") +
     scale_fill_brewer(palette = "PuBuGn", direction = 1) + 
     theme(axis.text.x = element_text(size  = 10, 
                                      angle = 45,
@@ -64,9 +64,9 @@ One major indication of mobility behavior is trip purpose. In the plot below, I 
 ```
 
 As the plot above only shows the Ability variable and trip purpose, it is likely that other variables have an influence on the difference in number of trips taken. Income, for example, may explain why wheelchair users travel differently than the abled population. 
-This plot shows the same distribution of number of trips by purpose, but includes the income groups. 
+This plot shows the same distribution of number of trips by purpose, but includes and compares the income groups. (Zoom in if necessary)
 
-```{r purpose.grid}
+```{r purpose.grid, fig.width=12, fig.height=12}
 ggplot(joined_grid_trips, aes(x = n)) + 
   geom_histogram(aes(y = stat(width*density), fill = Ability), binwidth = 0.8, colour = "black", size = .1, position = "dodge") +
     ggtitle("Comparing the number of trips by trip purpose and Income group", subtitle = "Comparison of Ability") +

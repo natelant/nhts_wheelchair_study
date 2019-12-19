@@ -341,14 +341,12 @@ new_grid &lt;- expand_grid(hhpersonid = unique(new_trips$hhpersonid), trippurp =
 joined_grid_trips &lt;- new_trips %&gt;% right_join(new_grid) %&gt;%
   mutate(n = ifelse(is.na(n), 0, n)) %&gt;%
   left_join(persons_edited, &quot;hhpersonid&quot;) </code></pre>
-<pre><code>## Joining, by = c(&quot;hhpersonid&quot;, &quot;trippurp&quot;)</code></pre>
-<pre><code>## Warning: Column `trippurp` has different attributes on LHS and RHS of join</code></pre>
 <p>One major indication of mobility behavior is trip purpose. In the plot below, I show the counts (as a distribution) for number of trips in a day by trip purpose. The results show that travel behavior is different between the able bodied population and the wheelchair-dependent population. The major outlier is the home-based work trips, and that can be attributed to the major difference in employment among the ability groups.</p>
 <pre class="r"><code>  # build distribution histogram from the built out grid of trips counted
   ggplot(joined_grid_trips, aes(x = n)) + 
   geom_histogram(aes(y = stat(width*density), fill = Ability), binwidth = 0.8, colour = &quot;black&quot;, size = .1, position = &quot;dodge&quot;) +
-    ggtitle(&quot;Comparing the number of trips by trip purpose and Income group&quot;, subtitle = &quot;Comparison of Ability&quot;) +
-    labs(x = &quot;Number of Trips&quot;, y = &quot;Percent of subgroup population&quot;) +
+    ggtitle(&quot;Comparing the Number of Trips in a Single Day&quot;, subtitle = &quot;Comparison of Ability&quot;) +
+    labs(x = &quot;Number of Trips&quot;, y = &quot;Percent of Subgroup Population&quot;) +
     scale_fill_brewer(palette = &quot;PuBuGn&quot;, direction = 1) + 
     theme(axis.text.x = element_text(size  = 10, 
                                      angle = 45,
@@ -357,8 +355,8 @@ joined_grid_trips &lt;- new_trips %&gt;% right_join(new_grid) %&gt;%
     scale_x_continuous(breaks = c(0:10)) +
     scale_y_continuous(labels = percent_format()) +
     facet_wrap(~trippurp)</code></pre>
-<p><img src="trip_purpose_files/figure-html/trip.purpose-1.png" width="120%" style="display: block; margin: auto;" /></p>
-<p>As the plot above only shows the Ability variable and trip purpose, it is likely that other variables have an influence on the difference in number of trips taken. Income, for example, may explain why wheelchair users travel differently than the abled population. This plot shows the same distribution of number of trips by purpose, but includes the income groups.</p>
+<p><img src="trip_purpose_files/figure-html/trip.purpose-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p>As the plot above only shows the Ability variable and trip purpose, it is likely that other variables have an influence on the difference in number of trips taken. Income, for example, may explain why wheelchair users travel differently than the abled population. This plot shows the same distribution of number of trips by purpose, but includes and compares the income groups. (Zoom in if necessary)</p>
 <pre class="r"><code>ggplot(joined_grid_trips, aes(x = n)) + 
   geom_histogram(aes(y = stat(width*density), fill = Ability), binwidth = 0.8, colour = &quot;black&quot;, size = .1, position = &quot;dodge&quot;) +
     ggtitle(&quot;Comparing the number of trips by trip purpose and Income group&quot;, subtitle = &quot;Comparison of Ability&quot;) +
@@ -371,7 +369,7 @@ joined_grid_trips &lt;- new_trips %&gt;% right_join(new_grid) %&gt;%
     scale_x_continuous(breaks = c(0:10)) +
     scale_y_continuous(labels = percent_format()) +
     facet_grid(trippurp ~ Income, scales = &quot;free_x&quot;)</code></pre>
-<p><img src="trip_purpose_files/figure-html/purpose.grid-1.png" width="672" /></p>
+<p><img src="trip_purpose_files/figure-html/purpose.grid-1.png" width="1152" /></p>
 <p>Note the changes in number of trips for wheelchair users as income increases. For home-based work trips, the percent of users who make zero trips decreases, while the number of zero trips for HBO and HBSHOP increase with income.</p>
 <pre class="r"><code># make hhfaminc a factor in the joined_grid_trips data frame
 joined_grid_trips &lt;- joined_grid_trips %&gt;%

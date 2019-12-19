@@ -176,6 +176,7 @@ nhts_persons %>% group_by(Ability, Income) %>%
                                      vjust = 1))
 ```
 
+The interactive table below shows the number of individuals that responded to the survey, their income group, and their ability. The NHTS uses weights to calculate the total population based on the number of respondents, then the table shows the distribution of that weighted population for each subgroup.
 ```{r income.stats}
 nhts_persons %>% group_by(Ability, Income) %>%
   summarise(Survey = n(),
@@ -218,7 +219,7 @@ nhts_persons %>% group_by(Ability, Worker) %>%
 # 5. Creates Income variable, reorders the levels and filters "NA"
 nhts_persons %>%
   mutate(hhpersonid = paste(houseid, personid, sep = "-")) %>% 
-  write_rds("R/edited_persons.rds") 
+  write_rds("data/edited_persons.rds") 
 # 6. Creates the "houseid-personid" unique id for each person
 ```
  
