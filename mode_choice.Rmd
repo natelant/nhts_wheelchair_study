@@ -28,71 +28,102 @@ The NHTS reports mode chosen per trip reported. Below is a table that shows the 
 **Distribution of Mode Choice**
 ```{r mode.table}
 # This table includes all modes. Distribution is of weighted population.
-persons_trips %>% group_by(Ability, trptrans) %>%
+persons_trips %>% 
+  # Calculate number of people in each combination of mode and ability.
+  group_by(Ability, trptrans) %>%
   summarise(Survey = n(),
             population = sum(wtperfin)) %>%
   mutate(Population = population,
-         `Distribution(%)` = round(population/sum(population)*100, 1),
+        `Distribution(%)` = 
+          round(population/sum(population)*100, 1),
          Mode = as_factor(trptrans)) %>%
   select(Ability, Mode, `Distribution(%)`) %>%
-  spread(Ability, `Distribution(%)`) %>% datatable()
+  spread(Ability, `Distribution(%)`) %>% 
+  datatable()
 ```
 
 As some of the modes are irrelevant to the study, the mode choices will be aggregated into categories. The NHTS asks respondents if they were drivers or passengers on their trip, and this information is important as many wheelchair-dependent individuals may rely on others for private transportation. The following modes were highlighted as most relevant.
 ```{r aggregate.mode, fig.align = "center"}
-persons_trips %>% mutate(Mode = case_when(psgr_flg == "02" & trptrans == "03" | trptrans == "04" | trptrans == "06"  ~ "Car (Driver)",
-                                          psgr_flg == "01" & trptrans == "03" | trptrans == "04" | trptrans == "06"  ~ "Car (Passenger)",
-                                          psgr_flg == "02" & trptrans == "05" ~ "Van (Driver)",
-                                          psgr_flg == "01" & trptrans == "05" ~ "Van (Passenger)",
-                                          trptrans == "01" ~ "Walk",
-                                          trptrans == "12" ~ "Paratransit",
-                                          trptrans == "17" ~ "Taxi (Including Uber/Lyft)",
-                                          trptrans == "11" | trptrans == "16"  ~ "Local Transit",
-                                          trptrans == "07" | trptrans == "08" | trptrans == "09" | trptrans == "10" | trptrans == "14" | trptrans == "15" | trptrans == "18" | trptrans == "19" | trptrans == "20" | trptrans == "97" | trptrans == "02" | trptrans == "13"  ~ "Other"),
-                         Mode = fct_relevel(Mode, "Car (Driver)", "Car (Passenger)", "Van (Driver)", "Van (Passenger)", "Local Transit", "Paratransit", "Taxi (Including Uber/Lyft)", "Walk", "Other"))  %>%
+persons_trips %>% 
+  # We want to consolidate all the diferent modes into a more limited number
+  # of categories to make things easier to visualize. Also, no one cares about
+  # lawnmowers and segways.
+  mutate(
+    Mode = case_when(
+      psgr_flg == "02" & trptrans == "03" | trptrans == "04" | 
+        trptrans == "06"  ~ "Car (Driver)",
+      psgr_flg == "01" & trptrans == "03" | trptrans == "04" | 
+        trptrans == "06"  ~ "Car (Passenger)",
+      psgr_flg == "02" & trptrans == "05" ~ "Van (Driver)",
+      psgr_flg == "01" & trptrans == "05" ~ "Van (Passenger)",
+      trptrans == "01" ~ "Walk",
+      trptrans == "12" ~ "Paratransit",
+      trptrans == "17" ~ "Taxi (Including Uber/Lyft)",
+      trptrans == "11" | trptrans == "16"  ~ "Local Transit",
+      TRUE  ~ "Other"
+      ),
+    Mode = fct_relevel(Mode, "Car (Driver)", "Car (Passenger)", "Van (Driver)", 
+      "Van (Passenger)", "Local Transit", "Paratransit", 
+      "Taxi (Including Uber/Lyft)", "Walk", "Other")
+    )  %>%
+  
+  # Calculate number of people in each combo of ability and mode.
   group_by(Ability, Mode) %>%
   summarise(Population = sum(wtperfin)) %>%
     as_factor() %>%
     mutate(Distribution = Population/sum(Population)) %>%
+  
+  # Create histogram of mode choice for each ability group
   ggplot(aes(x = Mode, y = Distribution)) + 
     geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
     ggtitle("Distribution of Mode Ages 18-64", "Comparison of Ability") +
     labs(x = "Mode", y = "Distribution") +
     scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
-    theme(axis.text.x = element_text(size  = 10, 
-                                     angle = 45,
-                                     hjust = 1,
-                                     vjust = 1))
+    theme(axis.text.x = element_text(size  = 10, angle = 45, hjust = 1, vjust = 1))
 ```
 
 There is a significant decrease in the distribution of abled individuals from driver to passenger in both the car and the van. However, this difference is not as critical for wheelchair users (especially for the van).
 
 ### Income Group
-By separating the populations by mode choice, the plot highlights some interesting information.
+By separating the populations by mode choice, the plot highlights some interesting information. These plots show of the total income group population, what perecentage of the ability groups use each mode. Nearly 45% of wheelchair users in the high income group ride as passengers in a private vehicle.
 
 ```{r income.mode, fig.align = "center"}
-persons_trips %>% mutate(Mode = case_when(psgr_flg == "02" & trptrans == "03" | trptrans == "04" | trptrans == "06"  ~ "Car (Driver)",
-                                          psgr_flg == "01" & trptrans == "03" | trptrans == "04" | trptrans == "06"  ~ "Car (Passenger)",
-                                          psgr_flg == "02" & trptrans == "05" ~ "Van (Driver)",
-                                          psgr_flg == "01" & trptrans == "05" ~ "Van (Passenger)",
-                                          trptrans == "01" ~ "Walk",
-                                          trptrans == "12" ~ "Paratransit",
-                                          trptrans == "17" ~ "Taxi (Including Uber/Lyft)",
-                                          trptrans == "11" | trptrans == "16"  ~ "Local Transit",
-                                          trptrans == "07" | trptrans == "08" | trptrans == "09" | trptrans == "10" | trptrans == "14" | trptrans == "15" | trptrans == "18" | trptrans == "19" | trptrans == "20" | trptrans == "97" | trptrans == "02" | trptrans == "13"  ~ "Other"),
-                         Mode = fct_relevel(Mode, "Car (Driver)", "Car (Passenger)", "Van (Driver)", "Van (Passenger)", "Local Transit", "Paratransit", "Taxi (Including Uber/Lyft)", "Walk", "Other"))  %>%
+persons_trips %>%
+  # 
+  mutate(
+    Mode = case_when(
+      psgr_flg == "02" & trptrans == "03" | trptrans == "04" |
+        trptrans == "06"  ~ "Car (Driver)",
+      psgr_flg == "01" & trptrans == "03" | trptrans == "04" |
+        trptrans == "06"  ~ "Car (Passenger)",
+      psgr_flg == "02" & trptrans == "05" ~ "Van (Driver)",
+      psgr_flg == "01" & trptrans == "05" ~ "Van (Passenger)",
+      trptrans == "01" ~ "Walk",
+      trptrans == "12" ~ "Paratransit",
+      trptrans == "17" ~ "Taxi (Including Uber/Lyft)",
+      trptrans == "11" | trptrans == "16"  ~ "Local Transit",
+      TRUE ~ "Other"
+    ),
+    Mode = fct_relevel(Mode, "Car (Driver)", "Car (Passenger)", "Van (Driver)",
+      "Van (Passenger)", "Local Transit", "Paratransit", 
+      "Taxi (Including Uber/Lyft)", "Walk", "Other")
+  ) %>%
+
+  # Calculate number of people in each combo of ability, mode, and income
   group_by(Ability, Mode, Income) %>%
   summarise(Population = sum(wtperfin)) %>%
-    as_factor() %>%
-    mutate(Distribution = Population/sum(Population)) %>%
-  ggplot(aes(x = Mode, y = Distribution)) + 
+  
+  mutate(Income = as_factor(Income)) %>%
+  group_by(Ability, Income) %>%
+  mutate(Distribution = Population/sum(Population)) %>%
+
+  # make a plot of the distributions
+  ggplot(aes(x = Mode, y = Distribution)) +
     geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
     ggtitle("Distribution of Mode Ages 18-64", "Comparison of Ability") +
     labs(x = "Mode", y = "Distribution") +
-    scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
-    theme(axis.text.x = element_text(size  = 10, 
-                                     angle = 45,
-                                     hjust = 1,
-                                     vjust = 1)) +
-  facet_wrap(~ Income)
+    scale_fill_brewer(palette = "PuBuGn", direction = 2) +
+    theme(axis.text.x =
+      element_text(size  = 10, angle = 45, hjust = 1, vjust = 1) ) +
+    facet_wrap(~ Income)
 ```
