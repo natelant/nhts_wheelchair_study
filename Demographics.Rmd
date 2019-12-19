@@ -40,16 +40,17 @@ Those that responded disabled for more than six months or their whole life were 
 
 # Create the "Ability" variable in nhts_persons.
 nhts_persons <- nhts_persons %>% 
-  left_join(nhts_households %>% select(houseid, hhfaminc, hhstate), 
+  left_join(nhts_households %>% 
+              # I only need a couple variables from the household file
+              select(houseid, hhfaminc, hhstate), 
             by = "houseid") %>%
-  mutate(Ability = case_when(w_chair == "07" | w_mtrchr == "08" ~ "Wheelchair",
-                             medcond6 == "02" | medcond6 == "03" ~ "Disabled",  
-                             medcond == "02" ~ "Abled")) %>% 
-  
+  mutate(Ability = 
+           case_when(
+               w_chair == "07" | w_mtrchr == "08" ~ "Wheelchair",
+               medcond6 == "02" | medcond6 == "03" ~ "Disabled",  
+               medcond == "02" ~ "Abled")
+           ) %>% 
   filter(Ability != "NA")
-
-# I also want to group age into bin size of 10 years and income into three groups, "low", "med", and "high"
-
 ```
 
 The NHTS uses weights on each variable to estimate the total population. In my comparisons, I will show the number of survey respondents, the weighted population, and the distribution of the population (I also filtered out NA responses, as they account for 0.6% of the population).
@@ -72,7 +73,8 @@ The age demographic of wheelchair users is obviously different from the able bod
 **Summary Statistics of Age**
 ```{r age.summary}
 # Summary of all ages
-nhts_persons %>% group_by(Ability) %>%
+nhts_persons %>% 
+  group_by(Ability) %>%
   summarise(Mean = mean(r_age),
             Median = median(r_age)) %>%
   pander()
@@ -91,9 +93,13 @@ nhts_persons <- nhts_persons %>%
                          r_age >= 80 & r_age < 90 ~ "80 - 90",
                          r_age >= 90 & r_age < 100 ~ "90 - 100"))  
 
-nhts_persons %>% group_by(Ability, Age) %>%
+# calculate the population statistics
+nhts_persons %>% 
+  group_by(Ability, Age) %>%
   summarise(population = sum(wtperfin)) %>%
   mutate(Distribution = population/sum(population)) %>%
+  
+  # Create plot of the age distribution 
   ggplot(aes(x = Age, y = Distribution)) + 
     geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
     ggtitle("Distribution of Age", "Comparison of Ability") +
@@ -109,8 +115,9 @@ nhts_persons %>% group_by(Ability, Age) %>%
 
 **Summary Statistics of Ages 18-64**
 ```{r age.summary.filtered}
-# Update the nhts_persons variable
-nhts_persons <- nhts_persons %>% filter(r_age >= 18 & r_age <= 64)
+# Update the nhts_persons variable by filter age.
+nhts_persons <- nhts_persons %>% 
+  filter(r_age >= 18 & r_age <= 64)
 
 # Summary of ages 18-64
 nhts_persons %>% group_by(Ability) %>%
@@ -125,20 +132,22 @@ The trends in income are very different! This raises questions about how mobilit
 
 
 ```{r income.distribution}
-nhts_persons %>% group_by(Ability, hhfaminc) %>%
+nhts_persons %>% 
+  # calculating population for statistics on income
+  group_by(Ability, hhfaminc) %>%
     filter(hhfaminc > 0) %>%
     summarise(Population = sum(wtperfin)) %>%
     as_factor() %>%
     mutate(Distribution = Population/sum(Population)) %>%
+  
+  # create histogram of the income distribution
   ggplot(aes(x = hhfaminc, y = Distribution)) + 
     geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
     ggtitle("Distribution of Income Ages 18-64", "Comparison of Ability") +
     labs(x = "Income", y = "Distribution") +
     scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
-    theme(axis.text.x = element_text(size  = 10, 
-                                     angle = 45,
-                                     hjust = 1,
-                                     vjust = 1))
+    theme(axis.text.x = 
+            element_text(size  = 10, angle = 45, hjust = 1,  vjust = 1))
 ```
 
 The NHTS reported income in the categories shown above, not as a quantitative variable. In the following pages, I want to highlight how income affects mobility, so income will be divided into the following groups for convenience.
@@ -147,11 +156,16 @@ The NHTS reported income in the categories shown above, not as a quantitative va
 ```{r income.divide}
 # Create income group varaible "Income"
 nhts_persons <- nhts_persons %>%
-  mutate(Income = case_when(hhfaminc == "01" | hhfaminc == "02" | hhfaminc == "03" ~ "Low",
-                            hhfaminc == "04" | hhfaminc == "05" ~ "Mid-Low",
-                            hhfaminc == "06" | hhfaminc == "07" ~ "Mid-High",
-                            hhfaminc == "08" | hhfaminc == "09" | hhfaminc == "10" | hhfaminc == "11" ~ "High"),
-         Income = fct_relevel(Income, "Low", "Mid-Low", "Mid-High", "High")) %>%
+  mutate(
+    Income = case_when(
+      hhfaminc == "01" | hhfaminc == "02" | hhfaminc == "03" ~ "Low",
+      hhfaminc == "04" | hhfaminc == "05" ~ "Mid-Low",
+      hhfaminc == "06" | hhfaminc == "07" ~ "Mid-High",
+      hhfaminc == "08" | hhfaminc == "09" | hhfaminc == "10" | hhfaminc == "11" ~ "High"
+     ),
+    Income = fct_relevel(
+      Income, "Low", "Mid-Low", "Mid-High", "High")
+   ) %>%
   filter(Income != "NA")
 ```
 
@@ -161,29 +175,35 @@ nhts_persons <- nhts_persons %>%
  + *High* = More than $100,000
  
 ```{r income.group.distribution}
-# Distribution plot
-nhts_persons %>% group_by(Ability, Income) %>%
+# calculates the distribution of income of population using the
+# subgroups
+nhts_persons %>% 
+  group_by(Ability, Income) %>%
   summarise(Population = sum(wtperfin)) %>% 
-    mutate(Distribution = Population/sum(Population)) %>%
+  mutate(Distribution = Population/sum(Population)) %>%
+  
+  # histogram plot of income groups
   ggplot(aes(x = Income, y = Distribution)) + 
     geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
-    ggtitle("Distribution of Income by Groups Ages 18 - 64", "Comparison of Ability") +
+    ggtitle("Distribution of Income by Groups Ages 18 - 64",
+            "Comparison of Ability"
+            ) +
     labs(x = "Income", y = "Distribution") +
     scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
-    theme(axis.text.x = element_text(size  = 10, 
-                                     angle = 45,
-                                     hjust = 1,
-                                     vjust = 1))
+    theme(axis.text.x = 
+            element_text(size  = 10, angle = 45, hjust = 1, vjust = 1))
 ```
 
 The interactive table below shows the number of individuals that responded to the survey, their income group, and their ability. The NHTS uses weights to calculate the total population based on the number of respondents, then the table shows the distribution of that weighted population for each subgroup.
+
 ```{r income.stats}
 # dynamic table of ability and income
-nhts_persons %>% group_by(hhstate, Ability, Income) %>%
+nhts_persons %>% 
+  group_by(hhstate, Ability, Income) %>%
   summarise(Survey = n(),
             population = round(sum(wtperfin), 0)) %>%
   mutate(Population = population,
-         `Distribution(%)` = round(population/sum(population)*100, 1)) %>%
+        `Distribution(%)` = round(population/sum(population)*100, 1)) %>%
   select(-population) %>%
   datatable()
 ```
@@ -191,24 +211,32 @@ nhts_persons %>% group_by(hhstate, Ability, Income) %>%
 ### Employment Status
 The NHTS asked respondents if they work, and those that respond yes were asked if they work full-time or part-time. The results are shown below and are extremely contrast. Is unemployment at all related to limited access to transportation?
 ```{r employment}
+# create the worker variable with three categories for worker status
 nhts_persons <- nhts_persons %>%
-  mutate(Worker = case_when(wkftpt == "01" ~ "Full-Time",
-                            wkftpt == "02" ~ "Part-Time",
-                            wkftpt == "-1" ~ "Unemployed")) %>%
+  mutate(Worker = 
+           case_when(wkftpt == "01" ~ "Full-Time",
+                     wkftpt == "02" ~ "Part-Time",
+                     wkftpt == "-1" ~ "Unemployed"
+                     )
+         ) %>%
   filter(Worker != "NA")
 
-nhts_persons %>% group_by(Ability, Worker) %>%
+# Calculate the 
+nhts_persons %>% 
+  group_by(Ability, Worker) %>%
   summarise(Population = sum(wtperfin)) %>% 
-    mutate(Distribution = Population/sum(Population)) %>%
+  mutate(Distribution = Population/sum(Population)) %>%
+  
+  # build the bar plot for worker status
   ggplot(aes(x = Worker, y = Distribution)) + 
-    geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
-    ggtitle("Distribution of Worker Status Groups Ages 18 - 64", "Comparison of Ability") +
+    geom_col(aes(fill = Ability), 
+             colour = "Black", position = "dodge") +
+    ggtitle("Distribution of Worker Status Groups Ages 18 - 64", 
+            subtitle = "Comparison of Ability") +
     labs(x = "Worker Status", y = "Distribution") +
     scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
-    theme(axis.text.x = element_text(size  = 10, 
-                                     angle = 45,
-                                     hjust = 1,
-                                     vjust = 1))
+    theme(axis.text.x = 
+            element_text(size  = 10, angle = 45,  hjust = 1, vjust = 1))
 ```
  
 ```{r store.data}
