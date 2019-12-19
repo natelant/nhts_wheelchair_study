@@ -66,3 +66,33 @@ persons_trips %>% mutate(Mode = case_when(psgr_flg == "02" & trptrans == "03" | 
 ```
 
 There is a significant decrease in the distribution of abled individuals from driver to passenger in both the car and the van. However, this difference is not as critical for wheelchair users (especially for the van).
+
+### Income Group
+By separating the populations by mode choice, the plot highlights some interesting information.
+
+```{r income.mode, fig.align = "center"}
+persons_trips %>% mutate(Mode = case_when(psgr_flg == "02" & trptrans == "03" | trptrans == "04" | trptrans == "06"  ~ "Car (Driver)",
+                                          psgr_flg == "01" & trptrans == "03" | trptrans == "04" | trptrans == "06"  ~ "Car (Passenger)",
+                                          psgr_flg == "02" & trptrans == "05" ~ "Van (Driver)",
+                                          psgr_flg == "01" & trptrans == "05" ~ "Van (Passenger)",
+                                          trptrans == "01" ~ "Walk",
+                                          trptrans == "12" ~ "Paratransit",
+                                          trptrans == "17" ~ "Taxi (Including Uber/Lyft)",
+                                          trptrans == "11" | trptrans == "16"  ~ "Local Transit",
+                                          trptrans == "07" | trptrans == "08" | trptrans == "09" | trptrans == "10" | trptrans == "14" | trptrans == "15" | trptrans == "18" | trptrans == "19" | trptrans == "20" | trptrans == "97" | trptrans == "02" | trptrans == "13"  ~ "Other"),
+                         Mode = fct_relevel(Mode, "Car (Driver)", "Car (Passenger)", "Van (Driver)", "Van (Passenger)", "Local Transit", "Paratransit", "Taxi (Including Uber/Lyft)", "Walk", "Other"))  %>%
+  group_by(Ability, Mode, Income) %>%
+  summarise(Population = sum(wtperfin)) %>%
+    as_factor() %>%
+    mutate(Distribution = Population/sum(Population)) %>%
+  ggplot(aes(x = Mode, y = Distribution)) + 
+    geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
+    ggtitle("Distribution of Mode Ages 18-64", "Comparison of Ability") +
+    labs(x = "Mode", y = "Distribution") +
+    scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1)) +
+  facet_wrap(~ Income)
+```

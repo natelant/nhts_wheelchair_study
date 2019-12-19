@@ -40,7 +40,7 @@ Those that responded disabled for more than six months or their whole life were 
 
 # Create the "Ability" variable in nhts_persons.
 nhts_persons <- nhts_persons %>% 
-  left_join(nhts_households %>% select(houseid, hhfaminc), 
+  left_join(nhts_households %>% select(houseid, hhfaminc, hhstate), 
             by = "houseid") %>%
   mutate(Ability = case_when(w_chair == "07" | w_mtrchr == "08" ~ "Wheelchair",
                              medcond6 == "02" | medcond6 == "03" ~ "Disabled",  
@@ -178,7 +178,8 @@ nhts_persons %>% group_by(Ability, Income) %>%
 
 The interactive table below shows the number of individuals that responded to the survey, their income group, and their ability. The NHTS uses weights to calculate the total population based on the number of respondents, then the table shows the distribution of that weighted population for each subgroup.
 ```{r income.stats}
-nhts_persons %>% group_by(Ability, Income) %>%
+# dynamic table of ability and income
+nhts_persons %>% group_by(hhstate, Ability, Income) %>%
   summarise(Survey = n(),
             population = round(sum(wtperfin), 0)) %>%
   mutate(Population = population,
