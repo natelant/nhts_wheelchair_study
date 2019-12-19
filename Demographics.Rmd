@@ -15,6 +15,7 @@ library(plotly)
 library(pander)
 library(ggpubr)
 library(Hmisc)
+library(DT)
 
 source("R/output_functions.R")
 
@@ -173,6 +174,16 @@ nhts_persons %>% group_by(Ability, Income) %>%
                                      angle = 45,
                                      hjust = 1,
                                      vjust = 1))
+```
+
+```{r income.stats}
+nhts_persons %>% group_by(Ability, Income) %>%
+  summarise(Survey = n(),
+            population = round(sum(wtperfin), 0)) %>%
+  mutate(Population = population,
+         `Distribution(%)` = round(population/sum(population)*100, 1)) %>%
+  select(-population) %>%
+  datatable()
 ```
 
 ### Employment Status

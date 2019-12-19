@@ -49,7 +49,7 @@ persons_trips  %>%
   pander()
 ```
 
-```{r plot.length.purpose.income, out.width = "120%", fig.align = "center"}
+```{r plot.length.purpose.income, fig.align = "center"}
 # nhts_persons is still filtered by Age
 persons_trips %>%
   filter(trpmiles < 50,
@@ -71,18 +71,20 @@ ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) + geom_violin() +
 
 ## Trip Length Frequency Distribution
 
-```{r length.frequency, message=F, out.width = "120%", fig.align = "center"}
-persons_trips %>%
+```{r length.frequency, message=F, fig.align = "center"}
+plot <- persons_trips %>%
   filter(trpmiles < 50,
          trpmiles > 0,
          trippurp != -9) %>%
-  ggplot(aes(x = trpmiles, fill = Ability)) + geom_histogram(aes(y = stat(width*density)), alpha = 0.4, position = "identity") +
-  facet_grid(Income ~ trippurp) +
+  ggplot(aes(x = trpmiles, fill = trippurp)) + geom_histogram(aes(y = stat(width*density)), alpha = 0.7, position = "identity") +
+  facet_grid(Ability ~ Income) +
     ggtitle("Comparing the Trip Length Frequency Distribution under 50 Miles by Trip Purpose and Income group Ages 18-24", subtitle = "Comparison of Ability") +
     labs( y = "Distribution of Frequency") +
-    scale_fill_brewer(palette = "PuBuGn", direction = 1) + 
+    scale_fill_brewer(palette = "Set3", direction = 1) + 
     theme(axis.text.x = element_text(size  = 10, 
                                      angle = 45,
                                      hjust = 1,
                                      vjust = 1))
+
+plot %>% ggplotly(tooltip = c("x", "y", "fill"))
 ```
