@@ -81,7 +81,7 @@ ggplot(joined_grid_trips, aes(x = n)) +
     facet_grid(trippurp ~ Income, scales = "free_x")
 ```
 
-Note the changes in number of trips for wheelchair users as income increases. For home-based work trips, the percent of users who make zero trips decreases, while the number of zero trip
+Note the changes in number of trips for wheelchair users as income increases. For home-based work trips, the percent of users who make zero trips decreases, while the number of zero trips for HBO and HBSHOP increase with income. 
 
 ```{r purpose.over.time, eval=F}
 # make hhfaminc a factor in the joined_grid_trips data frame
