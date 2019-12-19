@@ -25,8 +25,9 @@ library(Hmisc)
 persons_edited <- read_rds("data/edited_persons.rds") 
 
 # This data will contain all trips (all households, persons, etc.)
-# find all trips that belong to an hhpersonid groups them by purpose and counts them
-new_trips <- nhts_trips %>% mutate(hhpersonid = paste(houseid, personid, sep = "-")) %>%
+# First find all trips that belong to an hhpersonid, group them by purpose and count them
+new_trips <- nhts_trips %>% 
+  mutate(hhpersonid = paste(houseid, personid, sep = "-")) %>%
   filter(hhpersonid %in% persons_edited$hhpersonid) %>%
   group_by(hhpersonid, trippurp) %>%
   tally() %>%
@@ -34,12 +35,15 @@ new_trips <- nhts_trips %>% mutate(hhpersonid = paste(houseid, personid, sep = "
 
 
 # build the grid a row for every hhpersonid and purpose.
-new_grid <- expand_grid(hhpersonid = unique(new_trips$hhpersonid), trippurp = unique(new_trips$trippurp)) %>%
+new_grid <- expand_grid(
+  hhpersonid = unique(new_trips$hhpersonid), trippurp = unique(new_trips$trippurp)
+  ) %>%
   filter(trippurp != "-9")
 
 
 # combine the grid and the trips
-joined_grid_trips <- new_trips %>% right_join(new_grid) %>%
+joined_grid_trips <- new_trips %>% 
+  right_join(new_grid) %>%
   mutate(n = ifelse(is.na(n), 0, n)) %>%
   left_join(persons_edited, "hhpersonid") 
 ```
@@ -50,14 +54,16 @@ One major indication of mobility behavior is trip purpose. In the plot below, I 
 ```{r trip.purpose, message=F, warning=F, fig.width=8, fig.height=6, fig.align = "center"}
   # build distribution histogram from the built out grid of trips counted
   ggplot(joined_grid_trips, aes(x = n)) + 
-  geom_histogram(aes(y = stat(width*density), fill = Ability), binwidth = 0.8, colour = "black", size = .1, position = "dodge") +
-    ggtitle("Comparing the Number of Trips in a Single Day", subtitle = "Comparison of Ability") +
+  geom_histogram(
+    aes(y = stat(width*density), fill = Ability), 
+    binwidth = 0.8, colour = "black", size = .1, position = "dodge"
+    ) +
+  ggtitle("Comparing the Number of Trips in a Single Day", 
+          subtitle = "Comparison of Ability") +
     labs(x = "Number of Trips", y = "Percent of Subgroup Population") +
     scale_fill_brewer(palette = "PuBuGn", direction = 1) + 
-    theme(axis.text.x = element_text(size  = 10, 
-                                     angle = 45,
-                                     hjust = 1,
-                                     vjust = 1)) +
+    theme(axis.text.x = 
+            element_text(size  = 10, angle = 45, hjust = 1, vjust = 1)) +
     scale_x_continuous(breaks = c(0:10)) +
     scale_y_continuous(labels = percent_format()) +
     facet_wrap(~trippurp)
@@ -88,8 +94,11 @@ Note the changes in number of trips for wheelchair users as income increases. Fo
 joined_grid_trips <- joined_grid_trips %>%
   mutate(hhfaminc = as.factor(hhfaminc))
 
-# plot the changes in number of trips over time for each purpose, income group, and ability.
-ggplot(joined_grid_trips, aes(x = hhfaminc, y = stat(width*density))) +
+# plot the changes in number of trips over time for each purpose, 
+# income group, and ability.
+ggplot(data = joined_grid_trips, 
+       aes(x = hhfaminc, y = stat(width*density))
+       ) +
   geom_line(aes(color = Ability)) +
   geom_point(aes(color = Ability))
 ```
