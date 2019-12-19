@@ -12,4 +12,4 @@ In 2018, the Taxi and Limousine Commission (TLC) in New York City issued a manda
 ### California
 In September of 2018, the State of California filed SB 1376 which "requires the Public Utilities Commission, by January 1, 2019, to begin conducting workshops with stakeholders in order to determine community WAV demand and WAV supply and to develop and provide recommendations regarding specified topics for programs for on-demand services and partnerships. The bill would require each TNC, by July 1, 2019, to pay on a quarterly basis to the commission an amount equivalent to, at a minimum, $0.05 for each TNC trip completed. The bill would require moneys collected by the commission to be deposited in the TNC Access for All Fund, which the bill would create, and would continuously appropriate moneys deposited in the fund to the commission for purposes of the program. The bill would require the commission to distribute funds from the TNC Access for All Fund on a competitive basis to access providers that establish on-demand transportation programs or partnerships to meet the needs of persons with disabilities." ^[@California2019].
 
-
+### References
