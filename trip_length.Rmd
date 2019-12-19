@@ -19,12 +19,14 @@ library(Hmisc)
 
 ```{r data.refresh}
 # Add hhpersonid to nhts_trips
-nhts_trips <- nhts_trips %>% mutate(hhpersonid = paste(houseid, personid, sep = "-"),
-                                    trpmiles = as.double(trpmiles))
+nhts_trips <- nhts_trips %>% 
+  mutate(hhpersonid = paste(houseid, personid, sep = "-"),
+         trpmiles = as.double(trpmiles))
 
 # Join persons_edited file from Demographics.Rmd with trips
 read_rds("data/edited_persons.rds") %>% 
-  left_join(nhts_trips %>% select(hhpersonid, trpmiles, trippurp, trptrans, trvlcmin, psgr_flg), 
+  left_join(nhts_trips %>% 
+              select(hhpersonid, trpmiles, trippurp, trptrans, trvlcmin, psgr_flg), 
             by = "hhpersonid") %>%
   filter(trptrans > 0) %>%
   write_rds("data/persons_trips.rds")
@@ -49,7 +51,7 @@ persons_trips  %>%
             SD = sd(trpmiles) %>% round(1),
             Median = median(trpmiles) %>% round(1),
             Max = max(trpmiles)) %>%
-   pander()
+  pander()
 ```
 
 ```{r plot.length.purpose.income, fig.width=12, fig.height=12}
@@ -59,35 +61,44 @@ persons_trips %>%
          trpmiles > 0,
          trippurp != -9) %>%
 # Grid violin plot
-ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) + geom_violin() +
+ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) + 
+  geom_violin() +
   geom_boxplot(width=0.1, fill = "white") +
   facet_grid(Income ~ trippurp, scales = "free_x") +
-    ggtitle("Comparing the Trip Length under 50 Miles by Trip Purpose and Income Group", subtitle = "Comparison of Ability Ages 18-24") +
-    labs( y = "Lenth of Trip in Miles") +
-    scale_fill_brewer(palette = "PuBuGn", direction = 1) + 
-    theme(axis.text.x = element_text(size  = 10, 
-                                     angle = 45,
-                                     hjust = 1,
-                                     vjust = 1))
+  ggtitle(
+    label = "Trip Length under 50 Miles by Trip Purpose and Income Group", 
+    subtitle = "Comparison of Ability Ages 18-24"
+  ) +
+  labs( y = "Lenth of Trip in Miles") +
+  scale_fill_brewer(palette = "PuBuGn", direction = 1) + 
+  theme(axis.text.x = 
+          element_text(size  = 10, angle = 45, hjust = 1, vjust = 1))
 
 ```
 
 ## Trip Length Frequency Distribution
 
 ```{r length.frequency, message=F}
+# plots the distribution of frequency for trip length.
+# the persons_trips data is stored from the above code on this page.
 plot <- persons_trips %>%
   filter(trpmiles < 50,
          trpmiles > 0,
          trippurp != -9) %>%
-  ggplot(aes(x = trpmiles, fill = trippurp)) + geom_histogram(aes(y = stat(width*density)), alpha = 0.7, position = "identity") +
+  ggplot(aes(x = trpmiles, fill = trippurp)) + 
+  geom_histogram(aes(y = stat(width*density)), 
+                 alpha = 0.7, position = "identity") +
   facet_grid(Ability ~ Income) +
-    ggtitle("Comparing the Trip Length Frequency Distribution under 50 Miles by Trip Purpose and Income group Ages 18-24", subtitle = "Comparison of Ability") +
-    labs(x = "Trip Distance (miles)", y = "Distribution of Frequency") +
-    scale_fill_brewer(palette = "Set3", direction = 1) + 
-    theme(axis.text.x = element_text(size  = 10, 
-                                     angle = 45,
-                                     hjust = 1,
-                                     vjust = 1))
+  ggtitle(
+    label = "Trip Length Frequency Distribution under 50 Miles for Income Groups", 
+    subtitle = "Comparison of Ability Ages 18-24"
+  ) +
+  labs(x = "Trip Distance (miles)", y = "Distribution of Frequency") +
+  scale_fill_brewer(palette = "Set3", direction = 1) + 
+  theme(axis.text.x = 
+          element_text(size  = 10, angle = 45, hjust = 1, vjust = 1))
 
-plot %>% ggplotly(tooltip = c("x", "y", "fill"), width = 1000, height = 1000)
+# make the histogram dynamic with plotly
+plot %>% 
+  ggplotly(tooltip = c("x", "y", "fill"), width = 1000, height = 1000)
 ```
