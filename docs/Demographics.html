@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Nate Lant" />
+
+
+<title>Demographics</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">WAV</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="Demographics.html">Demographics</a>
+</li>
+<li>
+  <a href="trip_purpose.html">Trip Purpose</a>
+</li>
+<li>
+  <a href="trip_length.html">Trip Length</a>
+</li>
+<li>
+  <a href="mode_choice.html">Mode Choice</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Demographics</h1>
+<h4 class="author">Nate Lant</h4>
+
+</div>
+
+
+<div id="what-percent-of-the-u.s.-population-uses-a-wheelchair" class="section level2">
+<h2>What percent of the U.S. population uses a wheelchair?</h2>
+<p>This study compares the mobility of the abled population, the disabled population, and the population that uses wheelchairs. To make this comparison, I created a new variable called “Ability”, where each person is labelled “Abled”, “Disabled”, or “Wheelchair”.</p>
+<p>In the 2017 National Household Travel Survey (NHTS), the respondents are asked if they have a medical condition or handicap that makes it difficult to travel outside of the home. If they respond yes, they are asked if they have had this condition for less than six months, more than six months or their whole life. The next follow-up question asks them to select all that apply from a list of medical devices they use. This list includes a cane, walker, seeing eye-dog, crutches, motorized scooter, manual sheelchair, motorized wheelchair, or something else.</p>
+<p>Those that responded disabled for more than six months or their whole life were labelled “Disabled”. Those that responded disabled (for more than six months or their whole life) and used a wheelchair (either manual or mechanical) were labelled “Wheelchair” (note the “Disabled” population does not include wheelchair users). The rest were labelled “Abled”.</p>
+<pre class="r"><code># install.packages(&quot;devtools&quot;)
+# devtools::install_github(&quot;byu-transpolab/nhts2017&quot;)
+
+# library(nhts2017)
+# library(tidyverse)
+
+# Create the &quot;Ability&quot; variable in nhts_persons.
+nhts_persons &lt;- nhts_persons %&gt;% 
+  left_join(nhts_households %&gt;% select(houseid, hhfaminc), 
+            by = &quot;houseid&quot;) %&gt;%
+  mutate(Ability = case_when(w_chair == &quot;07&quot; | w_mtrchr == &quot;08&quot; ~ &quot;Wheelchair&quot;,
+                             medcond6 == &quot;02&quot; | medcond6 == &quot;03&quot; ~ &quot;Disabled&quot;,  
+                             medcond == &quot;02&quot; ~ &quot;Abled&quot;)) %&gt;% 
+  
+  filter(Ability != &quot;NA&quot;)
+
+# I also want to group age into bin size of 10 years and income into three groups, &quot;low&quot;, &quot;med&quot;, and &quot;high&quot;</code></pre>
+<p>The NHTS uses weights on each variable to estimate the total population. In my comparisons, I will show the number of survey respondents, the weighted population, and the distribution of the population (I also filtered out NA responses, as they account for 0.6% of the population).</p>
+<pre class="r"><code>nhts_persons %&gt;% group_by(Ability) %&gt;%
+  summarise(Survey = n(),
+            population = sum(wtperfin)) %&gt;%
+  mutate(Population = population,
+         `Distribution(%)` = round(population/sum(population)*100, 1)) %&gt;%
+  select(-population) %&gt;%
+  pander()</code></pre>
+<table style="width:74%;">
+<colgroup>
+<col width="18%" />
+<col width="12%" />
+<col width="18%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Ability</th>
+<th align="center">Survey</th>
+<th align="center">Population</th>
+<th align="center">Distribution(%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Abled</td>
+<td align="center">238919</td>
+<td align="center">2.76e+08</td>
+<td align="center">92</td>
+</tr>
+<tr class="even">
+<td align="center">Disabled</td>
+<td align="center">19974</td>
+<td align="center">20276943</td>
+<td align="center">6.8</td>
+</tr>
+<tr class="odd">
+<td align="center">Wheelchair</td>
+<td align="center">3410</td>
+<td align="center">3605223</td>
+<td align="center">1.2</td>
+</tr>
+</tbody>
+</table>
+<div id="age" class="section level3">
+<h3>Age</h3>
+<p>The age demographic of wheelchair users is obviously different from the able bodied population. Age may have a significant effect on mobility patterns. For this study, the population ages 18-64 will be considered. Perhaps in the future, more specific research could be done on the older population where on-demand transportation could better serve the healthcare industry.</p>
+<p><strong>Summary Statistics of Age</strong></p>
+<pre class="r"><code># Summary of all ages
+nhts_persons %&gt;% group_by(Ability) %&gt;%
+  summarise(Mean = mean(r_age),
+            Median = median(r_age)) %&gt;%
+  pander()</code></pre>
+<table style="width:42%;">
+<colgroup>
+<col width="18%" />
+<col width="11%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Ability</th>
+<th align="center">Mean</th>
+<th align="center">Median</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Abled</td>
+<td align="center">46.96</td>
+<td align="center">51</td>
+</tr>
+<tr class="even">
+<td align="center">Disabled</td>
+<td align="center">64.16</td>
+<td align="center">66</td>
+</tr>
+<tr class="odd">
+<td align="center">Wheelchair</td>
+<td align="center">67.94</td>
+<td align="center">70</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>nhts_persons &lt;- nhts_persons %&gt;% 
+  mutate(Age = case_when(r_age &gt;= 00 &amp; r_age &lt; 10 ~ &quot;0 - 10&quot;,
+                         r_age &gt;= 10 &amp; r_age &lt; 20 ~ &quot;10 - 20&quot;,
+                         r_age &gt;= 20 &amp; r_age &lt; 30 ~ &quot;20 - 30&quot;,
+                         r_age &gt;= 30 &amp; r_age &lt; 40 ~ &quot;30 - 40&quot;,
+                         r_age &gt;= 40 &amp; r_age &lt; 50 ~ &quot;40 - 50&quot;,
+                         r_age &gt;= 50 &amp; r_age &lt; 60 ~ &quot;50 - 60&quot;,
+                         r_age &gt;= 60 &amp; r_age &lt; 70 ~ &quot;60 - 70&quot;,
+                         r_age &gt;= 70 &amp; r_age &lt; 80 ~ &quot;70 - 80&quot;,
+                         r_age &gt;= 80 &amp; r_age &lt; 90 ~ &quot;80 - 90&quot;,
+                         r_age &gt;= 90 &amp; r_age &lt; 100 ~ &quot;90 - 100&quot;))  
+
+nhts_persons %&gt;% group_by(Ability, Age) %&gt;%
+  summarise(population = sum(wtperfin)) %&gt;%
+  mutate(Distribution = population/sum(population)) %&gt;%
+  ggplot(aes(x = Age, y = Distribution)) + 
+    geom_col(aes(fill = Ability), colour = &quot;Black&quot;, position = &quot;dodge&quot;) +
+    ggtitle(&quot;Distribution of Age&quot;, &quot;Comparison of Ability&quot;) +
+    labs(x = &quot;Age&quot;, y = &quot;Distribution&quot;) +
+    scale_fill_brewer(palette = &quot;PuBuGn&quot;, direction = 2) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1))</code></pre>
+<p><img src="Demographics_files/figure-html/age.distribution%20plot-1.png" width="672" /></p>
+<p><strong>Summary Statistics of Ages 18-64</strong></p>
+<pre class="r"><code># Update the nhts_persons variable
+nhts_persons &lt;- nhts_persons %&gt;% filter(r_age &gt;= 18 &amp; r_age &lt;= 64)
+
+# Summary of ages 18-64
+nhts_persons %&gt;% group_by(Ability) %&gt;%
+  summarise(Mean = mean(r_age),
+            Median = median(r_age)) %&gt;%
+  pander()</code></pre>
+<table style="width:42%;">
+<colgroup>
+<col width="18%" />
+<col width="11%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Ability</th>
+<th align="center">Mean</th>
+<th align="center">Median</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Abled</td>
+<td align="center">44.68</td>
+<td align="center">46</td>
+</tr>
+<tr class="even">
+<td align="center">Disabled</td>
+<td align="center">51.49</td>
+<td align="center">55</td>
+</tr>
+<tr class="odd">
+<td align="center">Wheelchair</td>
+<td align="center">51.44</td>
+<td align="center">55</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="income" class="section level3">
+<h3>Income</h3>
+<p>The income demographic also differs greatly among the different ability groups. Travel behavior could be more influenced by income than by ability. This study will show the significance of both income and ability.</p>
+<pre class="r"><code>nhts_persons %&gt;% group_by(Ability, hhfaminc) %&gt;%
+    filter(hhfaminc &gt; 0) %&gt;%
+    summarise(Population = sum(wtperfin)) %&gt;%
+    as_factor() %&gt;%
+    mutate(Distribution = Population/sum(Population)) %&gt;%
+  ggplot(aes(x = hhfaminc, y = Distribution)) + 
+    geom_col(aes(fill = Ability), colour = &quot;Black&quot;, position = &quot;dodge&quot;) +
+    ggtitle(&quot;Distribution of Income Ages 18 - 64&quot;, &quot;Comparison of Ability&quot;) +
+    labs(x = &quot;Income&quot;, y = &quot;Distribution&quot;) +
+    scale_fill_brewer(palette = &quot;PuBuGn&quot;, direction = 2) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1))</code></pre>
+<p><img src="Demographics_files/figure-html/income.distribution-1.png" width="672" /></p>
+<p>Income is a categorical variable, as the NHTS data divides income into the above groups. This makes it difficult to calculate accurate summary statistics. For convenience, I will group income into the following categories.</p>
+<pre class="r"><code># Create income group varaible &quot;Income&quot;
+nhts_persons &lt;- nhts_persons %&gt;%
+  mutate(Income = case_when(hhfaminc == &quot;01&quot; | hhfaminc == &quot;02&quot; | hhfaminc == &quot;03&quot; ~ &quot;Low&quot;,
+                            hhfaminc == &quot;04&quot; | hhfaminc == &quot;05&quot; ~ &quot;Mid-Low&quot;,
+                            hhfaminc == &quot;06&quot; | hhfaminc == &quot;07&quot; ~ &quot;Mid-High&quot;,
+                            hhfaminc == &quot;08&quot; | hhfaminc == &quot;09&quot; | hhfaminc == &quot;10&quot; | hhfaminc == &quot;11&quot; ~ &quot;High&quot;),
+         Income = fct_relevel(Income, &quot;Low&quot;, &quot;Mid-Low&quot;, &quot;Mid-High&quot;, &quot;High&quot;)) %&gt;%
+  filter(Income != &quot;NA&quot;)</code></pre>
+<ul>
+<li><em>Low</em> = Less than $25,000</li>
+<li><em>Mid-Low</em> = $25,000 - $50,000</li>
+<li><em>Mid-High</em> = $50,000 - $100,000</li>
+<li><em>High</em> = More than $100,000</li>
+</ul>
+<pre class="r"><code># Distribution plot
+nhts_persons %&gt;% group_by(Ability, Income) %&gt;%
+  summarise(Population = sum(wtperfin)) %&gt;% 
+    mutate(Distribution = Population/sum(Population)) %&gt;%
+  ggplot(aes(x = Income, y = Distribution)) + 
+    geom_col(aes(fill = Ability), colour = &quot;Black&quot;, position = &quot;dodge&quot;) +
+    ggtitle(&quot;Distribution of Income by Groups Ages 18 - 64&quot;, &quot;Comparison of Ability&quot;) +
+    labs(x = &quot;Income&quot;, y = &quot;Distribution&quot;) +
+    scale_fill_brewer(palette = &quot;PuBuGn&quot;, direction = 2) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1))</code></pre>
+<p><img src="Demographics_files/figure-html/income.group.distribution-1.png" width="672" /></p>
+</div>
+<div id="employment-status" class="section level3">
+<h3>Employment Status</h3>
+<p>The NHTS asks respondents if they work. Those that respond yes are asked if they work full-time or part-time.</p>
+<pre class="r"><code>nhts_persons &lt;- nhts_persons %&gt;%
+  mutate(Worker = case_when(wkftpt == &quot;01&quot; ~ &quot;Full-Time&quot;,
+                            wkftpt == &quot;02&quot; ~ &quot;Part-Time&quot;,
+                            wkftpt == &quot;-1&quot; ~ &quot;Unemployed&quot;)) %&gt;%
+  filter(Worker != &quot;NA&quot;)
+
+nhts_persons %&gt;% group_by(Ability, Worker) %&gt;%
+  summarise(Population = sum(wtperfin)) %&gt;% 
+    mutate(Distribution = Population/sum(Population)) %&gt;%
+  ggplot(aes(x = Worker, y = Distribution)) + 
+    geom_col(aes(fill = Ability), colour = &quot;Black&quot;, position = &quot;dodge&quot;) +
+    ggtitle(&quot;Distribution of Worker Status Groups Ages 18 - 64&quot;, &quot;Comparison of Ability&quot;) +
+    labs(x = &quot;Worker Status&quot;, y = &quot;Distribution&quot;) +
+    scale_fill_brewer(palette = &quot;PuBuGn&quot;, direction = 2) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1))</code></pre>
+<p><img src="Demographics_files/figure-html/employment-1.png" width="672" /></p>
+<pre class="r"><code>## Storing the persons file to use in other .Rmd
+# 1. Joins households with houseid and hhfaminc
+# 2. Creates Ability variable (and filters &quot;NA&quot;)
+# 3. Creates age groups
+# 4. Filters age to 18-64
+# 5. Creates Income variable, reorders the levels and filters &quot;NA&quot;
+nhts_persons %&gt;%
+  mutate(hhpersonid = paste(houseid, personid, sep = &quot;-&quot;)) %&gt;% 
+  write_rds(&quot;R/edited_persons.rds&quot;) 
+# 6. Creates the &quot;houseid-personid&quot; unique id for each person</code></pre>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

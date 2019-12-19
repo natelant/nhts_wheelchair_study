@@ -1,10 +1,9 @@
 ---
 title: "Trip Length"
 author: "Nate Lant"
-date: "12/17/2019"
-output: html_document
-editor_options: 
-  chunk_output_type: console
+output: 
+  html_document:
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
@@ -38,7 +37,7 @@ persons_trips <- read_rds("R/persons_trips.rds")
  
 ```
 
-*Summary of Trip Length in Miles By Ability Ages 18-64*
+**Summary of Trip Length in Miles By Ability Ages 18-64**
 ```{r summary.length}
 # Summary
 persons_trips  %>%
@@ -50,7 +49,7 @@ persons_trips  %>%
   pander()
 ```
 
-```{r plot.length.purpose.income}
+```{r plot.length.purpose.income, out.width = "120%", fig.align = "center"}
 # nhts_persons is still filtered by Age
 persons_trips %>%
   filter(trpmiles < 50,
@@ -60,7 +59,7 @@ persons_trips %>%
 ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) + geom_violin() +
   geom_boxplot(width=0.1, fill = "white") +
   facet_grid(Income ~ trippurp, scales = "free_x") +
-    ggtitle("Comparing the Trip Length under 50 Miles by Trip Purpose and Income group Ages 18-24", subtitle = "Comparison of Ability") +
+    ggtitle("Comparing the Trip Length under 50 Miles by Trip Purpose and Income Group", subtitle = "Comparison of Ability Ages 18-24") +
     labs( y = "Lenth of Trip in Miles") +
     scale_fill_brewer(palette = "PuBuGn", direction = 1) + 
     theme(axis.text.x = element_text(size  = 10, 
@@ -72,7 +71,7 @@ ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) + geom_violin() +
 
 ## Trip Length Frequency Distribution
 
-```{r length.frequency}
+```{r length.frequency, message=F, out.width = "120%", fig.align = "center"}
 persons_trips %>%
   filter(trpmiles < 50,
          trpmiles > 0,

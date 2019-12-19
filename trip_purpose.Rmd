@@ -1,10 +1,9 @@
 ---
 title: "Trip Purpose"
 author: "Nate Lant"
-date: "12/16/2019"
-output: html_document
-editor_options: 
-  chunk_output_type: console
+output: 
+  html_document:
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
@@ -24,12 +23,9 @@ library(Hmisc)
 ```{r persons.data}
 # Creating variables and filtering the persons population
 persons_edited <- read_rds("R/edited_persons.rds") 
-```
 
-# How does travel differ between wheelchair users and the abled population considering trip purpose?
-
-```{r trip.purpose, message=F, warning=F}
 # This data will contain all trips (all households, persons, etc.)
+# find all trips that belong to an hhpersonid groups them by purpose and counts them
 new_trips <- nhts_trips %>% mutate(hhpersonid = paste(houseid, personid, sep = "-")) %>%
   filter(hhpersonid %in% persons_edited$hhpersonid) %>%
   group_by(hhpersonid, trippurp) %>%
@@ -37,7 +33,7 @@ new_trips <- nhts_trips %>% mutate(hhpersonid = paste(houseid, personid, sep = "
   mutate(n = ifelse(n > 10, 10, n))
 
 
-# builds the grid
+# build the grid a row for every hhpersonid and purpose.
 new_grid <- expand_grid(hhpersonid = unique(new_trips$hhpersonid), trippurp = unique(new_trips$trippurp)) %>%
   filter(trippurp != "-9")
 
@@ -46,8 +42,13 @@ new_grid <- expand_grid(hhpersonid = unique(new_trips$hhpersonid), trippurp = un
 joined_grid_trips <- new_trips %>% right_join(new_grid) %>%
   mutate(n = ifelse(is.na(n), 0, n)) %>%
   left_join(persons_edited, "hhpersonid") 
+```
 
-  # pipe into the histogram
+One major indication of mobility behavior is trip purpose. In the plot below, I show the counts (as a distribution) for number of trips in a day by trip purpose. The results show that travel behavior is different between the able bodied population and the wheelchair-dependent population. The major outlier is the home-based work trips, and that can be attributed to the major difference in employment among the ability groups.
+
+
+```{r trip.purpose, message=F, warning=F, out.width = "120%", fig.align = "center"}
+  # build distribution histogram from the built out grid of trips counted
   ggplot(joined_grid_trips, aes(x = n)) + 
   geom_histogram(aes(y = stat(width*density), fill = Ability), binwidth = 0.8, colour = "black", size = .1, position = "dodge") +
     ggtitle("Comparing the number of trips by trip purpose and Income group", subtitle = "Comparison of Ability") +
@@ -59,13 +60,44 @@ joined_grid_trips <- new_trips %>% right_join(new_grid) %>%
                                      vjust = 1)) +
     scale_x_continuous(breaks = c(0:10)) +
     scale_y_continuous(labels = percent_format()) +
-    facet_grid(Income ~ trippurp, scales = "free_x")
+    facet_wrap(~trippurp)
+```
+
+As the plot above only shows the Ability variable and trip purpose, it is likely that other variables have an influence on the difference in number of trips taken. Income, for example, may explain why wheelchair users travel differently than the abled population. 
+This plot shows the same distribution of number of trips by purpose, but includes the income groups. 
+
+```{r purpose.grid}
+ggplot(joined_grid_trips, aes(x = n)) + 
+  geom_histogram(aes(y = stat(width*density), fill = Ability), binwidth = 0.8, colour = "black", size = .1, position = "dodge") +
+    ggtitle("Comparing the number of trips by trip purpose and Income group", subtitle = "Comparison of Ability") +
+    labs(x = "Number of Trips", y = "Percent of subgroup population") +
+    scale_fill_brewer(palette = "PuBuGn", direction = 1) + 
+    theme(axis.text.x = element_text(size  = 10, 
+                                     angle = 45,
+                                     hjust = 1,
+                                     vjust = 1)) +
+    scale_x_continuous(breaks = c(0:10)) +
+    scale_y_continuous(labels = percent_format()) +
+    facet_grid(trippurp ~ Income, scales = "free_x")
+```
+
+Note the changes in number of trips for wheelchair users as income increases. For home-based work trips, the percent of users who make zero trips decreases, while the number of zero trip
+
+```{r purpose.over.time, eval=F}
+# make hhfaminc a factor in the joined_grid_trips data frame
+joined_grid_trips <- joined_grid_trips %>%
+  mutate(hhfaminc = as.factor(hhfaminc))
+
+# plot the changes in number of trips over time for each purpose, income group, and ability.
+ggplot(joined_grid_trips, aes(x = hhfaminc, y = stat(width*density))) +
+  geom_line(aes(color = Ability)) +
+  geom_point(aes(color = Ability))
 ```
 
 ## Poisson Regression
 It looks like "Ability" has no effect on trip purpose, instead, income may be what affects the number of trips by purpose the most.
 
-```{r purpose.poisson}
+```{r purpose.poisson, eval=FALSE}
 joined_grid_trips$HBW <- ifelse(joined_grid_trips$trippurp == "HBW", TRUE, FALSE)
 fit.hbw <- glm(HBW ~ Ability, Income, worker, family = "poisson", data = joined_grid_trips)
 ```

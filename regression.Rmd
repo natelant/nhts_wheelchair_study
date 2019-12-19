@@ -1,0 +1,20 @@
+---
+title: "Regression"
+author: "Nate Lant"
+date: "12/18/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Does "Ability" have any significant effect on travel behavior?
+As has been shown in this study, the population of wheelchair users differs from the abled population in many attributes including age, income, worker status, trip purpose, trip length, and mode choice. 
+
+
+### The Effect of Ability on Trip Purpose
+
+### The Effect of Ability on Trip Length
+
+### The Effect of Ability on Mode Choice
