@@ -324,8 +324,9 @@ $(document).ready(function () {
 persons_edited &lt;- read_rds(&quot;data/edited_persons.rds&quot;) 
 
 # This data will contain all trips (all households, persons, etc.)
-# find all trips that belong to an hhpersonid groups them by purpose and counts them
-new_trips &lt;- nhts_trips %&gt;% mutate(hhpersonid = paste(houseid, personid, sep = &quot;-&quot;)) %&gt;%
+# First find all trips that belong to an hhpersonid, group them by purpose and count them
+new_trips &lt;- nhts_trips %&gt;% 
+  mutate(hhpersonid = paste(houseid, personid, sep = &quot;-&quot;)) %&gt;%
   filter(hhpersonid %in% persons_edited$hhpersonid) %&gt;%
   group_by(hhpersonid, trippurp) %&gt;%
   tally() %&gt;%
@@ -333,25 +334,30 @@ new_trips &lt;- nhts_trips %&gt;% mutate(hhpersonid = paste(houseid, personid, s
 
 
 # build the grid a row for every hhpersonid and purpose.
-new_grid &lt;- expand_grid(hhpersonid = unique(new_trips$hhpersonid), trippurp = unique(new_trips$trippurp)) %&gt;%
+new_grid &lt;- expand_grid(
+  hhpersonid = unique(new_trips$hhpersonid), trippurp = unique(new_trips$trippurp)
+  ) %&gt;%
   filter(trippurp != &quot;-9&quot;)
 
 
 # combine the grid and the trips
-joined_grid_trips &lt;- new_trips %&gt;% right_join(new_grid) %&gt;%
+joined_grid_trips &lt;- new_trips %&gt;% 
+  right_join(new_grid) %&gt;%
   mutate(n = ifelse(is.na(n), 0, n)) %&gt;%
   left_join(persons_edited, &quot;hhpersonid&quot;) </code></pre>
 <p>One major indication of mobility behavior is trip purpose. In the plot below, I show the counts (as a distribution) for number of trips in a day by trip purpose. The results show that travel behavior is different between the able bodied population and the wheelchair-dependent population. The major outlier is the home-based work trips, and that can be attributed to the major difference in employment among the ability groups.</p>
 <pre class="r"><code>  # build distribution histogram from the built out grid of trips counted
   ggplot(joined_grid_trips, aes(x = n)) + 
-  geom_histogram(aes(y = stat(width*density), fill = Ability), binwidth = 0.8, colour = &quot;black&quot;, size = .1, position = &quot;dodge&quot;) +
-    ggtitle(&quot;Comparing the Number of Trips in a Single Day&quot;, subtitle = &quot;Comparison of Ability&quot;) +
+  geom_histogram(
+    aes(y = stat(width*density), fill = Ability), 
+    binwidth = 0.8, colour = &quot;black&quot;, size = .1, position = &quot;dodge&quot;
+    ) +
+  ggtitle(&quot;Comparing the Number of Trips in a Single Day&quot;, 
+          subtitle = &quot;Comparison of Ability&quot;) +
     labs(x = &quot;Number of Trips&quot;, y = &quot;Percent of Subgroup Population&quot;) +
     scale_fill_brewer(palette = &quot;PuBuGn&quot;, direction = 1) + 
-    theme(axis.text.x = element_text(size  = 10, 
-                                     angle = 45,
-                                     hjust = 1,
-                                     vjust = 1)) +
+    theme(axis.text.x = 
+            element_text(size  = 10, angle = 45, hjust = 1, vjust = 1)) +
     scale_x_continuous(breaks = c(0:10)) +
     scale_y_continuous(labels = percent_format()) +
     facet_wrap(~trippurp)</code></pre>
@@ -375,8 +381,11 @@ joined_grid_trips &lt;- new_trips %&gt;% right_join(new_grid) %&gt;%
 joined_grid_trips &lt;- joined_grid_trips %&gt;%
   mutate(hhfaminc = as.factor(hhfaminc))
 
-# plot the changes in number of trips over time for each purpose, income group, and ability.
-ggplot(joined_grid_trips, aes(x = hhfaminc, y = stat(width*density))) +
+# plot the changes in number of trips over time for each purpose, 
+# income group, and ability.
+ggplot(data = joined_grid_trips, 
+       aes(x = hhfaminc, y = stat(width*density))
+       ) +
   geom_line(aes(color = Ability)) +
   geom_point(aes(color = Ability))</code></pre>
 <div id="poisson-regression" class="section level2">

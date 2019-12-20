@@ -79,12 +79,13 @@ ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) +
 ## Trip Length Frequency Distribution
 
 ```{r length.frequency, message=F}
-# plots the distribution of frequency for trip length.
 # the persons_trips data is stored from the above code on this page.
 plot <- persons_trips %>%
   filter(trpmiles < 50,
          trpmiles > 0,
          trippurp != -9) %>%
+  
+  # plots the distribution of frequency for trip length.
   ggplot(aes(x = trpmiles, fill = trippurp)) + 
   geom_histogram(aes(y = stat(width*density)), 
                  alpha = 0.7, position = "identity") +
