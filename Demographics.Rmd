@@ -16,6 +16,7 @@ library(pander)
 library(ggpubr)
 library(Hmisc)
 library(DT)
+library(scales)
 
 source("R/output_functions.R")
 
@@ -23,7 +24,7 @@ nhts_persons <- nhts2017::nhts_persons
 ```
 
 ## What percent of the U.S. population uses a wheelchair?
-This study compares the mobility of the abled population, the disabled population, and the population that uses wheelchairs. To make this comparison, I created a new variable called "Ability", where each person is labelled "Abled", "Disabled", or "Wheelchair".
+This study compares the mobility of the abled population, the disabled population, and the population that uses wheelchairs. Using the 2017 National Household Travel Survey (NHTS), I created a new variable called "Ability", where each person is labelled "Abled", "Disabled", or "Wheelchair". The comparison in this study does not yet compare the statistical significance. Future research will compare the mobility behavior using regression models.
 
 In the 2017 NHTS, the respondents were asked if they have a medical condition or handicap that makes it difficult to travel outside of the home. If they responded yes, they were asked if they have had this condition for less than six months, more than six months or their whole life. The next follow-up question asked them to select all that apply from a list of medical devices they use. This list included a cane, walker, seeing eye-dog, crutches, motorized scooter, manual sheelchair, motorized wheelchair, or something else.
 
@@ -81,6 +82,7 @@ nhts_persons %>%
 ```
 
 ```{r age.distribution plot}
+# Update the nhts_persons variable with age bins
 nhts_persons <- nhts_persons %>% 
   mutate(Age = case_when(r_age >= 00 & r_age < 10 ~ "0 - 10",
                          r_age >= 10 & r_age < 20 ~ "10 - 20",
@@ -105,10 +107,8 @@ nhts_persons %>%
     ggtitle("Distribution of Age", "Comparison of Ability") +
     labs(x = "Age", y = "Distribution") +
     scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
-    theme(axis.text.x = element_text(size  = 10, 
-                                     angle = 45,
-                                     hjust = 1,
-                                     vjust = 1))
+    theme(axis.text.x = 
+            element_text(size  = 10, angle = 45, hjust = 1, vjust = 1))
 ```
 
 
@@ -185,9 +185,10 @@ nhts_persons %>%
   # histogram plot of income groups
   ggplot(aes(x = Income, y = Distribution)) + 
     geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
+    geom_text(aes(label = percent(Distribution %>% round(3))),
+              position = position_dodge(0.4), vjust = 0) +
     ggtitle("Distribution of Income by Groups Ages 18 - 64",
-            "Comparison of Ability"
-            ) +
+            "Comparison of Ability") +
     labs(x = "Income", y = "Distribution") +
     scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
     theme(axis.text.x = 
@@ -199,7 +200,7 @@ The interactive table below shows the number of individuals that responded to th
 ```{r income.stats}
 # dynamic table of ability and income
 nhts_persons %>% 
-  group_by(hhstate, Ability, Income) %>%
+  group_by(Ability, Income) %>%
   summarise(Survey = n(),
             population = round(sum(wtperfin), 0)) %>%
   mutate(Population = population,
