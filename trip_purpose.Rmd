@@ -104,7 +104,7 @@ ggplot(data = joined_grid_trips,
 ```
 
 ## Poisson Regression
-It looks like "Ability" has no effect on trip purpose, instead, income may be what affects the number of trips by purpose the most.
+It looks like "Ability" has no effect on trip purpose, instead, income may be what affects the number of trips by purpose the most. Future research will calculate the significance of Ability and Income on trip purpose counts.
 
 ```{r purpose.poisson, eval=FALSE}
 joined_grid_trips$HBW <- ifelse(joined_grid_trips$trippurp == "HBW", TRUE, FALSE)
