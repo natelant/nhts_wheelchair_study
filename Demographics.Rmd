@@ -185,8 +185,6 @@ nhts_persons %>%
   # histogram plot of income groups
   ggplot(aes(x = Income, y = Distribution)) + 
     geom_col(aes(fill = Ability), colour = "Black", position = "dodge") +
-    geom_text(aes(label = percent(Distribution %>% round(3))),
-              position = position_dodge(0.4), vjust = 0) +
     ggtitle("Distribution of Income by Groups Ages 18 - 64",
             "Comparison of Ability") +
     labs(x = "Income", y = "Distribution") +
@@ -210,7 +208,7 @@ nhts_persons %>%
 ```
 
 ### Employment Status
-The NHTS asked respondents if they work, and those that respond yes were asked if they work full-time or part-time. The results are shown below and are extremely contrast. Is unemployment at all related to limited access to transportation?
+The NHTS asked respondents if they work, and those that respond yes were asked if they work full-time or part-time. The results are shown below and are extremely different from the abled population. Is unemployment at all related to limited access to transportation?
 ```{r employment}
 # create the worker variable with three categories for worker status
 nhts_persons <- nhts_persons %>%
@@ -222,7 +220,7 @@ nhts_persons <- nhts_persons %>%
          ) %>%
   filter(Worker != "NA")
 
-# Calculate the 
+# Calculate the population disrtibution in each worker group
 nhts_persons %>% 
   group_by(Ability, Worker) %>%
   summarise(Population = sum(wtperfin)) %>% 
@@ -238,6 +236,33 @@ nhts_persons %>%
     scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
     theme(axis.text.x = 
             element_text(size  = 10, angle = 45,  hjust = 1, vjust = 1))
+```
+ 
+As age could have an effect on employment among the ability groups, I want to show the ages of each employment group. However, it appears that at all ages, the majority of the disabled and wheelchair-dependent users are unemployed.
+
+```{r age.employ}
+# same code from above with the exception of
+# Calculate the population disrtibution in each worker group
+nhts_persons %>% 
+  group_by(Ability, Worker, Age) %>%
+  summarise(Population = sum(wtperfin)) %>% 
+  # this second group by allows the facet_wrap to calculate total distribution of
+  # each age group
+  group_by(Ability, Age) %>%
+  mutate(Distribution = Population/sum(Population)) %>%
+  
+  # build the bar plot for worker status
+  ggplot(aes(x = Worker, y = Distribution)) + 
+    geom_col(aes(fill = Ability), 
+             colour = "Black", position = "dodge") +
+    ggtitle("Distribution of Worker Status Groups Ages 18 - 64", 
+            subtitle = "Comparison of Ability by Age") +
+    labs(x = "Worker Status", y = "Distribution") +
+    scale_fill_brewer(palette = "PuBuGn", direction = 2) + 
+    theme(axis.text.x = 
+            element_text(size  = 10, angle = 45,  hjust = 1, vjust = 1)) +
+    facet_wrap(~ Age)
+
 ```
  
 ```{r store.data}
