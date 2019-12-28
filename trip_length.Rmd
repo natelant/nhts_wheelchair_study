@@ -54,7 +54,7 @@ persons_trips  %>%
   pander()
 ```
 
-The boxplot below compares the length of trips (less than 50 miles) for every trip purpose and income group. Each row of plots shows an income group, and each column is a trip purpose. Note that the HBW (home-based work) column shows interesting trends because of the few number of employed workers in the wheelchair-dependent population.
+The boxplot below compares the length of trips (less than 50 miles) for every trip purpose and income group. Each column of plots shows an income group, and each row is a trip purpose. Note that the HBW (home-based work) column shows interesting trends because of the few number of employed workers in the wheelchair-dependent population.
 
 ```{r plot.length.purpose.income, fig.width=12, fig.height=12}
 # nhts_persons is still filtered by Age
@@ -66,7 +66,7 @@ persons_trips %>%
 ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) + 
   geom_violin() +
   geom_boxplot(width=0.1, fill = "white") +
-  facet_grid(Income ~ trippurp, scales = "free_x") +
+  facet_grid(trippurp ~ Income, scales = "free_x") +
   ggtitle(
     label = "Trip Length under 50 Miles by Trip Purpose and Income Group", 
     subtitle = "Comparison of Ability Ages 18-24"
@@ -80,7 +80,7 @@ ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) +
 
 ## Trip Length Frequency Distribution
 
-This plot is nearly the same as the boxplot above, but it shows the distriution of each Ability group and the length of trips they take. For example, in the top left corner, the plot shows the percent of each population that takes HBO (home-based other) trips from 0-1 mile, 1-2 miles, and so on for low income individuals. The plot is interactive to highlight the ability groups.
+This plot is nearly the same as the boxplot above, but it shows the distriution of each Ability group and the length of trips they take. For example, in the top left corner, the plot shows the percent of each population that takes HBO (home-based other) trips from 0-2 mile, 2-4 miles, and so on for low income individuals. The plot is interactive to highlight the ability groups.
 
 ```{r length.frequency, message=F}
 # the persons_trips data is stored from the above code on this page.
@@ -92,9 +92,9 @@ plot <- persons_trips %>%
   # plots the distribution of frequency for trip length.
   ggplot(aes(x = trpmiles, fill = Ability)) + 
   geom_histogram(aes(y = stat(width*density)), 
-                 binwidth = 25,
+                 binwidth = 2,
                  alpha = 0.7, position = "identity") +
-  facet_grid(Income ~ trippurp, scales = "free_x") +
+  facet_grid(trippurp ~ Income, scales = "free_x") +
   ggtitle(
     label = "Trip Length Frequency Distribution under 50 Miles for Income Groups", 
     subtitle = "Comparison of Ability Ages 18-24"
