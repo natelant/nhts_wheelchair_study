@@ -61,7 +61,8 @@ nhts_persons %>% group_by(Ability) %>%
   summarise(Survey = n(),
             population = sum(wtperfin)) %>%
   mutate(Population = population,
-         `Distribution(%)` = round(population/sum(population)*100, 1)) %>%
+         `Distribution(%)` = 
+           percent(population/sum(population), accuracy = 0.1)) %>%
   select(-population) %>%
   pander()
 ```
@@ -202,7 +203,8 @@ nhts_persons %>%
   summarise(Survey = n(),
             population = round(sum(wtperfin), 0)) %>%
   mutate(Population = population,
-        `Distribution(%)` = round(population/sum(population)*100, 1)) %>%
+        `Distribution(%)` = 
+          percent(population/sum(population), accuracy = 0.1)) %>%
   select(-population) %>%
   datatable()
 ```
