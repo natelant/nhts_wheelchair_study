@@ -44,6 +44,7 @@ new_grid <- expand_grid(
 # combine the grid and the trips
 joined_grid_trips <- new_trips %>% 
   right_join(new_grid) %>%
+  # if no trips were taken show they took 0 trips
   mutate(n = ifelse(is.na(n), 0, n)) %>%
   left_join(persons_edited, "hhpersonid") 
 ```

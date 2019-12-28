@@ -54,6 +54,8 @@ persons_trips  %>%
   pander()
 ```
 
+The boxplot below compares the length of trips (less than 50 miles) for every trip purpose and income group. Each row of plots shows an income group, and each column is a trip purpose. Note that the HBW (home-based work) column shows interesting trends because of the few number of employed workers in the wheelchair-dependent population.
+
 ```{r plot.length.purpose.income, fig.width=12, fig.height=12}
 # nhts_persons is still filtered by Age
 persons_trips %>%
@@ -78,6 +80,8 @@ ggplot(aes(x = Ability, y = trpmiles, fill = Ability)) +
 
 ## Trip Length Frequency Distribution
 
+This plot is nearly the same as the boxplot above, but it shows the distriution of each Ability group and the length of trips they take. For example, in the top left corner, the plot shows the percent of each population that takes HBO (home-based other) trips from 0-1 mile, 1-2 miles, and so on for low income individuals. The plot is interactive to highlight the ability groups.
+
 ```{r length.frequency, message=F}
 # the persons_trips data is stored from the above code on this page.
 plot <- persons_trips %>%
@@ -86,16 +90,17 @@ plot <- persons_trips %>%
          trippurp != -9) %>%
   
   # plots the distribution of frequency for trip length.
-  ggplot(aes(x = trpmiles, fill = trippurp)) + 
+  ggplot(aes(x = trpmiles, fill = Ability)) + 
   geom_histogram(aes(y = stat(width*density)), 
+                 binwidth = 25,
                  alpha = 0.7, position = "identity") +
-  facet_grid(Ability ~ Income) +
+  facet_grid(Income ~ trippurp, scales = "free_x") +
   ggtitle(
     label = "Trip Length Frequency Distribution under 50 Miles for Income Groups", 
     subtitle = "Comparison of Ability Ages 18-24"
-  ) +
+    ) +
   labs(x = "Trip Distance (miles)", y = "Distribution of Frequency") +
-  scale_fill_brewer(palette = "Set3", direction = 1) + 
+  scale_fill_brewer(palette = "PuBuGn", direction = 1) + 
   theme(axis.text.x = 
           element_text(size  = 10, angle = 45, hjust = 1, vjust = 1))
 

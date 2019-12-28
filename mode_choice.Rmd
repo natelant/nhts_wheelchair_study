@@ -23,7 +23,7 @@ library(DT)
 persons_trips <- read_rds("data/persons_trips.rds")
 ```
 
-The NHTS reports mode chosen per trip reported. Below is a table that shows the percent distribution of the mode choice for each population of ability. The interactive table allows the user to sort the table by variable to find the most frequent mode chosen by each ability group. As many of the modes are infrequent, many of the modes can be considered "other".
+The NHTS reports mode chosen by each person for each trip reported. Below is a table that shows the percent distribution of the mode choice for each population of Ability. The interactive table allows the user to sort the table by variable to find the most frequent mode chosen by each ability group.
 
 **Distribution of Mode Choice**
 ```{r mode.table}
@@ -43,6 +43,7 @@ persons_trips %>%
 ```
 
 As some of the modes are irrelevant to the study, the mode choices will be aggregated into categories. The NHTS asks respondents if they were drivers or passengers on their trip, and this information is important as many wheelchair-dependent individuals may rely on others for private transportation. The following modes were highlighted as most relevant.
+
 ```{r aggregate.mode, fig.align = "center"}
 persons_trips %>% 
   # We want to consolidate all the diferent modes into a more limited number
@@ -82,7 +83,7 @@ persons_trips %>%
     theme(axis.text.x = element_text(size  = 10, angle = 45, hjust = 1, vjust = 1))
 ```
 
-There is a significant decrease in the distribution of abled individuals from driver to passenger in both the car and the van. However, this difference is not as critical for wheelchair users (especially for the van).
+There is a noticeable decrease in the distribution of abled individuals from driver to passenger in both the car and the van. However, this difference is smaller for wheelchair users (especially for the van).
 
 ### Income Group
 By separating the populations by mode choice, the plot highlights some interesting information. These plots show of the total income group population, what perecentage of the ability groups use each mode. Nearly 45% of wheelchair users in the high income group ride as passengers in a private vehicle.
