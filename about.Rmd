@@ -3,6 +3,8 @@ title: "Mobility For the Disabled"
 bibliography: biblio.bib
 ---
 
+The purpose of this website is to highlight differences in mobility among the abled, disabled, and wheelchair dependent populations. Future research will test the differences using regression models and will ultimately advise decision makers on how to improve new systems of transportation to better serve the wheelchair-dependent population.
+
 ### U.S. DOT
 The U.S. Department of Transportation published that people with travel-limiting disabilities accounted for 8.5 percent of the population in 2001 and 10.2 percent in 2009. An estimated 13.4 million Americans age 18 to 64 have travel-limiting disabilities, accounting for slightly more than half of people with disabilities ^[@Brumbaugh2018]. This report states that 12.4 percent of people age 18 to 64 without disabilities report using ride-hailing services at least once in the last 30 days, only 4.6 percent of people with disabilities report doing so. Some organizations, including transit agencies and healthcare providers, have begun subsidizing ride-hailing services for people with disabilities.
 
