@@ -15,6 +15,7 @@ library(plotly)
 library(pander)
 library(ggpubr)
 library(Hmisc)
+library(scales)
 
 library(DT)
 
@@ -35,7 +36,8 @@ persons_trips %>%
             population = sum(wtperfin)) %>%
   mutate(Population = population,
         `Distribution(%)` = 
-          round(population/sum(population)*100, 1),
+           percent(population/sum(population), 
+                   accuracy = 0.1),
          Mode = as_factor(trptrans)) %>%
   select(Ability, Mode, `Distribution(%)`) %>%
   spread(Ability, `Distribution(%)`) %>% 
