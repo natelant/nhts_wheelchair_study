@@ -343,6 +343,7 @@ new_grid &lt;- expand_grid(
 # combine the grid and the trips
 joined_grid_trips &lt;- new_trips %&gt;% 
   right_join(new_grid) %&gt;%
+  # if no trips were taken show they took 0 trips
   mutate(n = ifelse(is.na(n), 0, n)) %&gt;%
   left_join(persons_edited, &quot;hhpersonid&quot;) </code></pre>
 <p>One major indication of mobility behavior is trip purpose. In the plot below, I show the counts (as a distribution) for number of trips in a day by trip purpose. The results show that travel behavior is different between the able bodied population and the wheelchair-dependent population. The major outlier is the home-based work trips, and that can be attributed to the major difference in employment among the ability groups.</p>
@@ -390,7 +391,7 @@ ggplot(data = joined_grid_trips,
   geom_point(aes(color = Ability))</code></pre>
 <div id="poisson-regression" class="section level2">
 <h2>Poisson Regression</h2>
-<p>It looks like “Ability” has no effect on trip purpose, instead, income may be what affects the number of trips by purpose the most.</p>
+<p>It looks like “Ability” has no effect on trip purpose, instead, income may be what affects the number of trips by purpose the most. Future research will calculate the significance of Ability and Income on trip purpose counts.</p>
 <pre class="r"><code>joined_grid_trips$HBW &lt;- ifelse(joined_grid_trips$trippurp == &quot;HBW&quot;, TRUE, FALSE)
 fit.hbw &lt;- glm(HBW ~ Ability, Income, worker, family = &quot;poisson&quot;, data = joined_grid_trips)</code></pre>
 </div>
